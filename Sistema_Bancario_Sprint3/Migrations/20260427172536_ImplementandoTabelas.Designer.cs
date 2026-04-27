@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sistema_Bancario_Sprint3.Data;
 
@@ -11,9 +12,11 @@ using Sistema_Bancario_Sprint3.Data;
 namespace Sistema_Bancario_Sprint3.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260427172536_ImplementandoTabelas")]
+    partial class ImplementandoTabelas
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,10 +158,10 @@ namespace Sistema_Bancario_Sprint3.Migrations
                         .HasColumnType("datetime(6)")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
-                    b.Property<long?>("IdContaDestino")
+                    b.Property<long?>("FK_conta_destino")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("IdContaOrigem")
+                    b.Property<long>("FK_conta_origem")
                         .HasColumnType("bigint");
 
                     b.Property<decimal>("Valor")
@@ -166,9 +169,9 @@ namespace Sistema_Bancario_Sprint3.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdContaDestino");
+                    b.HasIndex("FK_conta_destino");
 
-                    b.HasIndex("IdContaOrigem");
+                    b.HasIndex("FK_conta_origem");
 
                     b.ToTable("Transacoes", (string)null);
                 });
@@ -179,15 +182,13 @@ namespace Sistema_Bancario_Sprint3.Migrations
                         .WithMany("Contas")
                         .HasForeignKey("IdCliente")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_cliente");
+                        .IsRequired();
 
                     b.HasOne("Sistema_Bancario_Sprint3.Models.TipoConta", "TipoConta")
                         .WithMany("Contas")
                         .HasForeignKey("IdTipoConta")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_tipo_conta");
+                        .IsRequired();
 
                     b.Navigation("Cliente");
 
@@ -198,16 +199,14 @@ namespace Sistema_Bancario_Sprint3.Migrations
                 {
                     b.HasOne("Sistema_Bancario_Sprint3.Models.Conta", "ContaDestino")
                         .WithMany()
-                        .HasForeignKey("IdContaDestino")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("FK_conta_destino");
+                        .HasForeignKey("FK_conta_destino")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Sistema_Bancario_Sprint3.Models.Conta", "ContaOrigem")
                         .WithMany()
-                        .HasForeignKey("IdContaOrigem")
+                        .HasForeignKey("FK_conta_origem")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_conta_origem");
+                        .IsRequired();
 
                     b.Navigation("ContaDestino");
 

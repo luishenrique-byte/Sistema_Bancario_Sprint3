@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MySqlConnector;
 using Sistema_Bancario_Sprint3.Models;
 
 namespace Sistema_Bancario_Sprint3.Data.Mappings
@@ -28,17 +27,35 @@ namespace Sistema_Bancario_Sprint3.Data.Mappings
                 .HasConversion<string>()
                 .IsRequired();
 
-            builder.Property(c => c.TipoConta)
-                .HasConversion<string>()
-                .IsRequired();
-
             builder.Property(c => c.DataAbertura)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
             builder.HasOne(c => c.Cliente)
                 .WithMany(cl => cl.Contas)
-                .HasForeignKey(c => c.Id)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(c => c.IdCliente)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_cliente");
+            
+            builder.HasOne(c => c.TipoConta)
+                .WithMany(t=> t.Contas)
+                .HasForeignKey(c => c.IdTipoConta)            
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_tipo_conta");
+
+            builder.Property(c => c.CpnjVinculado)
+            .HasMaxLength(14)
+            .IsRequired(false); // Define como opcional no banco
+
+            builder.Property(c => c.LimiteCredito)
+                .HasPrecision(18, 2)
+                .IsRequired(false);
+
+            builder.Property(c => c.DiaRrendimento)
+                .IsRequired(false);
+
+            builder.Property(c => c.TaxaJuros)
+                .HasPrecision(5, 2) // Ex: 12.50%
+                .IsRequired(false);
         }
     }
 }

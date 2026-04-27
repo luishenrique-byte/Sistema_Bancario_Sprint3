@@ -16,17 +16,19 @@ namespace Sistema_Bancario_Sprint3.Data.Mappings
                 .HasColumnType("decimal(18,2)");
 
             builder.Property(t => t.DataHora)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
             builder.HasOne(t => t.ContaOrigem)
                 .WithMany()
-                .HasForeignKey(t => t.FK_conta_origem)
+                .HasForeignKey(t => t.IdContaOrigem)
+                .HasConstraintName("FK_conta_origem")
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(t => t.ContaDestino)
                 .WithMany()
-                .HasForeignKey(t => t.FK_conta_destino)
+                .HasForeignKey(t => t.IdContaDestino)
                 .IsRequired(false)
+                .HasConstraintName("FK_conta_destino")
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

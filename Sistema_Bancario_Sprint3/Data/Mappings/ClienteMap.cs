@@ -30,7 +30,7 @@ namespace Sistema_Bancario_Sprint3.Data.Mappings
                 .IsRequired();
 
             builder.Property(c => c.DataCadastro)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
             //comentar
             //builder.HasMany(c => c.Contas)

@@ -12,8 +12,8 @@ using Sistema_Bancario_Sprint3.Data;
 namespace Sistema_Bancario_Sprint3.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260424195043_ImplementarTabelas")]
-    partial class ImplementarTabelas
+    [Migration("20260427181723_ModificandoNomes")]
+    partial class ModificandoNomes
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,7 +36,7 @@ namespace Sistema_Bancario_Sprint3.Migrations
                     b.Property<DateTime>("DataCadastro")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -68,20 +68,37 @@ namespace Sistema_Bancario_Sprint3.Migrations
             modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.Conta", b =>
                 {
                     b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Agencia")
                         .IsRequired()
                         .HasMaxLength(4)
                         .HasColumnType("varchar(4)");
 
+                    b.Property<string>("CpnjVinculado")
+                        .HasMaxLength(14)
+                        .HasColumnType("varchar(14)");
+
                     b.Property<DateTime>("DataAbertura")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                    b.Property<int?>("DiaRrendimento")
+                        .HasColumnType("int");
 
                     b.Property<long>("IdCliente")
                         .HasColumnType("bigint");
+
+                    b.Property<long>("IdTipoConta")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal?>("LimiteCredito")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("NumeroConta")
                         .IsRequired()
@@ -98,15 +115,34 @@ namespace Sistema_Bancario_Sprint3.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("TipoConta")
+                    b.Property<decimal?>("TaxaJuros")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdCliente");
+
+                    b.HasIndex("IdTipoConta");
+
+                    b.ToTable("Contas", (string)null);
+                });
+
+            modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.TipoConta", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Contas", (string)null);
-
-                    b.UseTptMappingStrategy();
+                    b.ToTable("TipoContas");
                 });
 
             modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.Transacao", b =>
@@ -120,12 +156,12 @@ namespace Sistema_Bancario_Sprint3.Migrations
                     b.Property<DateTime>("DataHora")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
-                    b.Property<long?>("FK_conta_destino")
+                    b.Property<long?>("IdContaDestino")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("FK_conta_origem")
+                    b.Property<long>("IdContaOrigem")
                         .HasColumnType("bigint");
 
                     b.Property<decimal>("Valor")
@@ -133,106 +169,60 @@ namespace Sistema_Bancario_Sprint3.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FK_conta_destino");
+                    b.HasIndex("IdContaDestino");
 
-                    b.HasIndex("FK_conta_origem");
+                    b.HasIndex("IdContaOrigem");
 
                     b.ToTable("Transacoes", (string)null);
-                });
-
-            modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.ContaCorrente", b =>
-                {
-                    b.HasBaseType("Sistema_Bancario_Sprint3.Models.Conta");
-
-                    b.ToTable("Contas_Corrente", (string)null);
-                });
-
-            modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.ContaEmpresarial", b =>
-                {
-                    b.HasBaseType("Sistema_Bancario_Sprint3.Models.Conta");
-
-                    b.Property<string>("CpnjVinculado")
-                        .IsRequired()
-                        .HasMaxLength(14)
-                        .HasColumnType("varchar(14)");
-
-                    b.Property<decimal>("limiteCredito")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.ToTable("Contas_Empresarial", (string)null);
-                });
-
-            modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.ContaPoupanca", b =>
-                {
-                    b.HasBaseType("Sistema_Bancario_Sprint3.Models.Conta");
-
-                    b.Property<int>("DiaRrendimento")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TaxaJuros")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
-                    b.ToTable("Contas_Poupanca", (string)null);
                 });
 
             modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.Conta", b =>
                 {
                     b.HasOne("Sistema_Bancario_Sprint3.Models.Cliente", "Cliente")
                         .WithMany("Contas")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("IdCliente")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_cliente");
+
+                    b.HasOne("Sistema_Bancario_Sprint3.Models.TipoConta", "TipoConta")
+                        .WithMany("Contas")
+                        .HasForeignKey("IdTipoConta")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_tipo_conta");
 
                     b.Navigation("Cliente");
+
+                    b.Navigation("TipoConta");
                 });
 
             modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.Transacao", b =>
                 {
                     b.HasOne("Sistema_Bancario_Sprint3.Models.Conta", "ContaDestino")
                         .WithMany()
-                        .HasForeignKey("FK_conta_destino")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("IdContaDestino")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("FK_conta_destino");
 
                     b.HasOne("Sistema_Bancario_Sprint3.Models.Conta", "ContaOrigem")
                         .WithMany()
-                        .HasForeignKey("FK_conta_origem")
+                        .HasForeignKey("IdContaOrigem")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_conta_origem");
 
                     b.Navigation("ContaDestino");
 
                     b.Navigation("ContaOrigem");
                 });
 
-            modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.ContaCorrente", b =>
-                {
-                    b.HasOne("Sistema_Bancario_Sprint3.Models.Conta", null)
-                        .WithOne()
-                        .HasForeignKey("Sistema_Bancario_Sprint3.Models.ContaCorrente", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.ContaEmpresarial", b =>
-                {
-                    b.HasOne("Sistema_Bancario_Sprint3.Models.Conta", null)
-                        .WithOne()
-                        .HasForeignKey("Sistema_Bancario_Sprint3.Models.ContaEmpresarial", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.ContaPoupanca", b =>
-                {
-                    b.HasOne("Sistema_Bancario_Sprint3.Models.Conta", null)
-                        .WithOne()
-                        .HasForeignKey("Sistema_Bancario_Sprint3.Models.ContaPoupanca", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.Cliente", b =>
+                {
+                    b.Navigation("Contas");
+                });
+
+            modelBuilder.Entity("Sistema_Bancario_Sprint3.Models.TipoConta", b =>
                 {
                     b.Navigation("Contas");
                 });
