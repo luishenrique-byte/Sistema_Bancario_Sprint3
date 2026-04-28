@@ -23,7 +23,7 @@ namespace Sistema_Bancario_Sprint3.Data.Mappings
             builder.Property(c => c.Telefone)
                 .HasMaxLength(20);
 
-            builder.Property(c => c.tipoPessoa)
+            builder.Property(c => c.TipoPessoa)
                 .IsRequired();
 
             builder.Property(c => c.cpfCnpj)

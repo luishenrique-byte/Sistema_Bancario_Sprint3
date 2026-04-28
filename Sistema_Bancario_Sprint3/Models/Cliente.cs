@@ -10,7 +10,7 @@ namespace Sistema_Bancario_Sprint3.Models
         public string Nome { get; set; }        
         public string Email { get; set; }        
         public string Telefone { get; set; }
-        public TipoPessoa tipoPessoa { get; set; }
+        public TipoPessoa TipoPessoa { get; set; }
         public string cpfCnpj { get; set; }
         public DateTime DataCadastro { get; set; }
         public List<Conta> Contas { get; set; } = new List<Conta>();

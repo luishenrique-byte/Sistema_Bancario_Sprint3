@@ -21,6 +21,28 @@ namespace Sistema_Bancario_Sprint3.Controllers
         {
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCliente(int id)
+        {
+            
+            var cliente = await _context.Clientes.FindAsync(id);
+
+            if (cliente == null) return NotFound(new {mensagem = "Cliente não encontrado"});
+
+            var clienteDTO = new ClienteResponseDTO
+            {
+                Id = cliente.Id,
+                Nome = cliente.Nome,
+                Email = cliente.Email,
+                Telefone = cliente.Telefone,
+                TipoPessoa = cliente.TipoPessoa,
+                DataCadastro = cliente.DataCadastro
+            };
+
+            return Ok(clienteDTO);
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> GetClientes()
         {
@@ -34,15 +56,39 @@ namespace Sistema_Bancario_Sprint3.Controllers
                 Nome = c.Nome,
                 Email = c.Email,
                 Telefone = c.Telefone,
-                tipoPessoa = c.tipoPessoa,
-                cpfCnpj = c.cpfCnpj,
+                TipoPessoa = c.TipoPessoa,               
                 DataCadastro = c.DataCadastro
             }).ToList();
 
             return Ok(clientesDTO);
-        }  
-        
+        }
 
+        [HttpPost]
+        public async Task<ActionResult<ClienteResponseDTO>> PostCliente(ClienteResquestDTO clienteRequest)
+        {
+            var novoCliente = new Cliente
+            {
+                Nome = clienteRequest.Nome,
+                Email = clienteRequest.Email,
+                Telefone = clienteRequest.Telefone,
+                TipoPessoa = clienteRequest.TipoPessoa,
+                cpfCnpj = clienteRequest.cpfCnpj
+            };
+
+            _context.Clientes.Add(novoCliente);
+            await _context.SaveChangesAsync();
+
+            var clienteResponse = new ClienteResponseDTO
+            {
+                Id = novoCliente.Id,
+                Nome = novoCliente.Nome,
+                Email = novoCliente.Email,
+                Telefone = novoCliente.Telefone,
+                TipoPessoa = novoCliente.TipoPessoa,                
+                DataCadastro = novoCliente.DataCadastro
+            };
+            return CreatedAtAction(nameof(GetCliente), new { id = clienteResponse.Id }, clienteResponse);
+        }        
     }
 }
 
