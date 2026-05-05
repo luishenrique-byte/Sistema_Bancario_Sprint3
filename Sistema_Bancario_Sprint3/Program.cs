@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Sistema_Bancario_Sprint3.Data;
+using Sistema_Bancario_Sprint3.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,8 @@ var connectionString = builder.Configuration.GetConnectionString("ConexaoPadrao"
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 
 var app = builder.Build();
 
