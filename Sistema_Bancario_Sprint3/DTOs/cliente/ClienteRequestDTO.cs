@@ -1,9 +1,9 @@
 ﻿using Sistema_Bancario_Sprint3.Models.ENUM;
 using System.ComponentModel.DataAnnotations;
 
-namespace Sistema_Bancario_Sprint3.DTOs
+namespace Sistema_Bancario_Sprint3.DTOs.cliente
 {
-    public class ClienteResquestDTO
+    public class ClienteRequestDTO
     {
         [Required(ErrorMessage = "O nome é obrigatório.")]
         [MaxLength(100)]

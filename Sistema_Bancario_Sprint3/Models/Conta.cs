@@ -21,10 +21,11 @@ namespace Sistema_Bancario_Sprint3.Models
         // Relacionamento 1:N
         public long IdTipoConta { get; set; }
         public TipoConta TipoConta { get; set; } = null!;
-
-        public string? CpnjVinculado { get; set; } = string.Empty;
+        [Column(name:"CnpjVinculado")]
+        public string? CnpjVinculado { get; set; } = string.Empty;
         public decimal? LimiteCredito { get; set; }
-        public int? DiaRrendimento { get; set; }
+        [Column(name:"DiaRendimento")]
+        public int? DiaRendimento { get; set; }
         public decimal? TaxaJuros { get; set; }
 
     }

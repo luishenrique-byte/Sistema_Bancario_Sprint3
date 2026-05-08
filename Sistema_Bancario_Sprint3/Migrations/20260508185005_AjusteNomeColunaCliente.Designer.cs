@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sistema_Bancario_Sprint3.Data;
 
@@ -11,9 +12,11 @@ using Sistema_Bancario_Sprint3.Data;
 namespace Sistema_Bancario_Sprint3.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260508185005_AjusteNomeColunaCliente")]
+    partial class AjusteNomeColunaCliente
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,17 +78,16 @@ namespace Sistema_Bancario_Sprint3.Migrations
                         .HasMaxLength(4)
                         .HasColumnType("varchar(4)");
 
-                    b.Property<string>("CnpjVinculado")
+                    b.Property<string>("CpnjVinculado")
                         .HasMaxLength(14)
-                        .HasColumnType("varchar(14)")
-                        .HasColumnName("CnpjVinculado");
+                        .HasColumnType("varchar(14)");
 
                     b.Property<DateTime>("DataAbertura")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
-                    b.Property<int?>("DiaRendimento")
+                    b.Property<int?>("DiaRrendimento")
                         .HasColumnType("int")
                         .HasColumnName("DiaRendimento");
 

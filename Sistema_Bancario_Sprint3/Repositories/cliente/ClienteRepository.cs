@@ -2,7 +2,7 @@
 using Sistema_Bancario_Sprint3.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Sistema_Bancario_Sprint3.Repositories
+namespace Sistema_Bancario_Sprint3.Repositories.cliente
 {
     public class ClienteRepository : IClienteRepository
     {

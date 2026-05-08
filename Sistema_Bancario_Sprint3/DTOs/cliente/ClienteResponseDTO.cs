@@ -1,6 +1,6 @@
 ﻿using Sistema_Bancario_Sprint3.Models.ENUM;
 
-namespace Sistema_Bancario_Sprint3.DTOs
+namespace Sistema_Bancario_Sprint3.DTOs.cliente
 {
     public class ClienteResponseDTO
     {

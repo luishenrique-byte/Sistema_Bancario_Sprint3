@@ -42,7 +42,7 @@ namespace Sistema_Bancario_Sprint3.Data.Mappings
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_tipo_conta");
 
-            builder.Property(c => c.CpnjVinculado)
+            builder.Property(c => c.CnpjVinculado)
             .HasMaxLength(14)
             .IsRequired(false); // Define como opcional no banco
 
@@ -50,7 +50,7 @@ namespace Sistema_Bancario_Sprint3.Data.Mappings
                 .HasPrecision(18, 2)
                 .IsRequired(false);
 
-            builder.Property(c => c.DiaRrendimento)
+            builder.Property(c => c.DiaRendimento)
                 .IsRequired(false);
 
             builder.Property(c => c.TaxaJuros)
