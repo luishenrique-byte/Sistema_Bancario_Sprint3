@@ -3,7 +3,7 @@ using Sistema_Bancario_Sprint3.Repositories.conta;
 
 namespace Sistema_Bancario_Sprint3.Services.conta
 {
-    public class ContaService
+    public class ContaService : IContaService
     {
         private readonly IContaRepository _repository;
 

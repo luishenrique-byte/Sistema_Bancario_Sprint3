@@ -4,7 +4,7 @@ using Sistema_Bancario_Sprint3.Models;
 
 namespace Sistema_Bancario_Sprint3.Repositories.conta
 {
-    public class ContaRepository
+    public class ContaRepository : IContaRepository
     {
         private readonly AppDbContext _context;
 
@@ -26,7 +26,7 @@ namespace Sistema_Bancario_Sprint3.Repositories.conta
         public async Task PostConta(Conta conta)
         {
             await _context.Contas.AddAsync(conta);
-            await _context.SaveChangesAsync();            
+            await _context.SaveChangesAsync();
         }
         public async Task UpdateConta(Conta conta)
         {

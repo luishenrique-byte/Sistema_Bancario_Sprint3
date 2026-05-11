@@ -9,11 +9,15 @@ namespace Sistema_Bancario_Sprint3.Data.Mappings
         {
             builder.ToTable("Transacoes");
 
-            builder.HasKey(t => t.Id);
+            builder.HasKey(t => t.Id);            
 
             builder.Property(t => t.Valor)
                 .IsRequired()
                 .HasColumnType("decimal(18,2)");
+
+            builder.Property(t => t.Tipo)
+                .IsRequired()
+                .HasConversion<int>();
 
             builder.Property(t => t.DataHora)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");

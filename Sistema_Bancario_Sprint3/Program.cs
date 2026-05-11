@@ -1,7 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Sistema_Bancario_Sprint3.Data;
 using Sistema_Bancario_Sprint3.Repositories.cliente;
+using Sistema_Bancario_Sprint3.Repositories.conta;
+using Sistema_Bancario_Sprint3.Repositories.transacao;
+using Sistema_Bancario_Sprint3.Services;
 using Sistema_Bancario_Sprint3.Services.cliente;
+using Sistema_Bancario_Sprint3.Services.conta;
+using Sistema_Bancario_Sprint3.Services.transacao;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +25,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<IContaRepository, ContaRepository>();
+builder.Services.AddScoped<IContaService, ContaService>();
+builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
+builder.Services.AddScoped<ITransacaoService, TransacaoService>();
 
 var app = builder.Build();
 

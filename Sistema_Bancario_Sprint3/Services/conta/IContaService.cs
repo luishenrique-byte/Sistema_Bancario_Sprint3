@@ -7,7 +7,7 @@ namespace Sistema_Bancario_Sprint3.Services.conta
         Task<IEnumerable<ContaResponseDTO>> ObterTodas();
         Task<ContaResponseDTO> ObterPorId(long id);
         Task<ContaResponseDTO> CriarConta(ContaRequestDTO contaRequest);
-        Task<ContaResponseDTO> AtualizarConta(long id, ContaRequestDTO contaRequest);
-        Task<bool> DeletarConta(long id);
+        Task AtualizarConta(long id, ContaRequestDTO contaRequest);
+        Task DeletarConta(long id);
     }
 }
