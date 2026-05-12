@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sistema_Bancario_Sprint3.DTOs.conta;
 using Sistema_Bancario_Sprint3.Services.conta;
 
@@ -33,12 +34,16 @@ namespace Sistema_Bancario_Sprint3.Controllers
             return Ok(conta);
         }
 
+
+        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> PostCliente(ContaRequestDTO request)
+        public async Task<IActionResult> PostConta(ContaRequestDTO request)
         {
             var novaConta = await _service.CriarConta(request);
             return CreatedAtAction(nameof(GetContaById), new { id = novaConta.Id }, novaConta);
         }
+
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCLiente(long id, ContaRequestDTO request)
         {
@@ -46,6 +51,7 @@ namespace Sistema_Bancario_Sprint3.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteConta(long id)
         {

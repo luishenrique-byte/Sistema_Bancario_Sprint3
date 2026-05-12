@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sistema_Bancario_Sprint3.Data;
 using Sistema_Bancario_Sprint3.DTOs.cliente;
@@ -38,6 +39,8 @@ namespace Sistema_Bancario_Sprint3.Controllers
 
             return Ok(cliente);
         }
+
+
         [HttpPost]
         public async Task<IActionResult> PostCliente(ClienteRequestDTO request)
         {
@@ -45,6 +48,7 @@ namespace Sistema_Bancario_Sprint3.Controllers
             return CreatedAtAction(nameof(GetCliente), new { id = clienteCriado.Id }, clienteCriado);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCliente(long id, ClienteRequestDTO cliente)
         {
@@ -58,6 +62,8 @@ namespace Sistema_Bancario_Sprint3.Controllers
                 return NotFound(new { mensagem = ex.Message });
             }
         }
+
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCliente(long id)
         {

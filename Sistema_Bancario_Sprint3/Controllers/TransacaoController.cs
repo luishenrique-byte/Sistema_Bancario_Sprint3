@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sistema_Bancario_Sprint3.DTOs.transacao;
 using Sistema_Bancario_Sprint3.Services.transacao;
 
@@ -15,6 +16,7 @@ namespace Sistema_Bancario_Sprint3.Controllers
             _service = service;
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> PostTransacao(TransacaoRequestDTO request)
         {
@@ -27,7 +29,6 @@ namespace Sistema_Bancario_Sprint3.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
         }
 
         [HttpGet]
