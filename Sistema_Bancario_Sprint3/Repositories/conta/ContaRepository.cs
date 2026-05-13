@@ -29,10 +29,7 @@ namespace Sistema_Bancario_Sprint3.Repositories.conta
             await _context.SaveChangesAsync();
         }
         public async Task UpdateConta(Conta conta)
-        {
-            
-            Console.WriteLine($"Atualizando saldo: {conta.Saldo}");
-
+        {           
             _context.Contas.Update(conta);
             await _context.SaveChangesAsync();
         }
