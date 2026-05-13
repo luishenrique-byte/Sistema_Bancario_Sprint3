@@ -20,6 +20,7 @@ namespace Sistema_Bancario_Sprint3.Services.conta
                 Id = c.Id,
                 NumeroConta = c.NumeroConta,
                 Agencia = c.Agencia,
+                Saldo = c.Saldo,
                 Status = c.Status,
                 IdCliente = c.IdCliente,
                 IdTipoConta = c.IdTipoConta,
@@ -41,6 +42,7 @@ namespace Sistema_Bancario_Sprint3.Services.conta
             {
                 Id = conta.Id,
                 NumeroConta = conta.NumeroConta,
+                Saldo = conta.Saldo,
                 Agencia = conta.Agencia,
                 Status = conta.Status,
                 IdCliente = conta.IdCliente,

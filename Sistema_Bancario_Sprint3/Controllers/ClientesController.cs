@@ -40,7 +40,7 @@ namespace Sistema_Bancario_Sprint3.Controllers
             return Ok(cliente);
         }
 
-
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> PostCliente(ClienteRequestDTO request)
         {

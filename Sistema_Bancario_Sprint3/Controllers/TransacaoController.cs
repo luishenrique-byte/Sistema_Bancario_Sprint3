@@ -19,10 +19,10 @@ namespace Sistema_Bancario_Sprint3.Controllers
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> PostTransacao(TransacaoRequestDTO request)
-        {
+        {            
             try
             {
-                var resultado = await _service.RealizarTransacao(request);
+                var resultado = await _service.RealizarTransacao(request);                
                 return Ok(resultado);
             }
             catch (Exception ex)

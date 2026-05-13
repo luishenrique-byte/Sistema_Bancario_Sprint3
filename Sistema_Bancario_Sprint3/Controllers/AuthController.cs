@@ -29,7 +29,7 @@ namespace Sistema_Bancario_Sprint3.Controllers
                     Subject = new ClaimsIdentity(new[]
                     {
                         new Claim(ClaimTypes.Name, login.Usuario),
-                        new Claim(ClaimTypes.Role, "Administrados")
+                        new Claim(ClaimTypes.Role, "Administrador")
                     }),
                     Expires = DateTime.UtcNow.AddHours(2),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),

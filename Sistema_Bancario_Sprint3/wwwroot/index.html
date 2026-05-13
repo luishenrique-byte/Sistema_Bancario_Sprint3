@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank System - Admin Panel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .section {
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #0056b3;
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            margin-top: 15px;
+        }
+
+            button:hover {
+                background: #0056b3;
+            }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+            .btn-success:hover {
+                background: #218838;
+            }
+
+        .logout {
+            background: #6c757d;
+            width: auto;
+            padding: 10px 20px;
+            float: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="logout" onclick="logout()">Sair</button>
+        <h1>Sistema Bancário - Sprint 3</h1>
+
+        <div class="grid">
+            <div class="section">
+                <h2>1. Cadastrar Cliente</h2>
+                <form id="formCliente">
+                    <label>Nome Completo</label>
+                    <input type="text" id="nomeCliente" required>
+                    <label>E-mail</label>
+                    <input type="email" id="emailCliente" required>
+                    <label>CPF/CNPJ</label>
+                    <input type="text" id="cpfCnpj" required>
+                    <button type="submit">Salvar Cliente</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>2. Abrir Conta</h2>
+                <form id="formConta">
+                    <label>ID do Cliente</label>
+                    <input type="number" id="idCliente" required placeholder="ID gerado no passo 1">
+                    <label>Número da Conta</label>
+                    <input type="text" id="numConta" required>
+                    <label>Agência</label>
+                    <input type="text" id="agencia" value="0001">
+                    <label>Tipo de Conta</label>
+                    <select id="tipoConta">
+                        <option value="1">Corrente</option>
+                        <option value="2">Poupança</option>
+                    </select>
+                    <button type="submit" class="btn-success">Criar Conta</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. Realizar Depósito Inicial</h2>
+            <p><small>Use isso para dar saldo às contas criadas.</small></p>
+            <form id="formTransacao">
+                <label>ID da Conta</label>
+                <input type="number" id="idContaOrigem" required>
+                <label>Valor do Depósito (R$)</label>
+                <input type="number" step="0.01" id="valorTransacao" required>
+                <button type="submit">Depositar Saldo</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = 'login.html';
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        };
+
+        // --- SALVAR CLIENTE ---
+        document.getElementById('formCliente').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const body = {
+                nome: document.getElementById('nomeCliente').value,
+                email: document.getElementById('emailCliente').value,
+                cpfCnpj: document.getElementById('cpfCnpj').value,
+                telefone: "00000000",
+                tipoPessoa: 1
+            };
+            const res = await fetch('https://localhost:7044/api/clientes', { method: 'POST', headers, body: JSON.stringify(body) });
+            if (res.ok) {
+                const data = await res.json();
+                alert(`Cliente cadastrado! ANOTE O ID: ${data.id}`);
+            } else { alert("Erro ao cadastrar cliente"); }
+        });
+
+        // --- CRIAR CONTA ---
+        document.getElementById('formConta').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const body = {
+                idCliente: parseInt(document.getElementById('idCliente').value),
+                numeroConta: document.getElementById('numConta').value,
+                agencia: document.getElementById('agencia').value,
+                idTipoConta: parseInt(document.getElementById('tipoConta').value),
+                saldo: 0,
+                status: 1
+            };
+            const res = await fetch('https://localhost:7044/api/contas', { method: 'POST', headers, body: JSON.stringify(body) });
+            if (res.ok) {
+                const data = await res.json();
+                alert(`Conta criada! ANOTE O ID DA CONTA: ${data.id}`);
+            } else { alert("Erro ao criar conta"); }
+        });
+
+        // --- REALIZAR DEPÓSITO ---
+        document.getElementById('formTransacao').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const body = {
+                tipo: 1, // Depósito
+                valor: parseFloat(document.getElementById('valorTransacao').value),
+                idContaOrigem: parseInt(document.getElementById('idContaOrigem').value)
+            };
+            const res = await fetch('https://localhost:7044/api/Transacao', { method: 'POST', headers, body: JSON.stringify(body) });
+            if (res.ok) { alert("Saldo adicionado com sucesso!"); }
+            else { alert("Erro na transação"); }
+        });
+
+        function logout() { localStorage.removeItem('token'); window.location.href = 'login.html'; }
+    </script>
+</body>
+</html>

@@ -45,7 +45,7 @@ namespace Sistema_Bancario_Sprint3.Services.transacao
         }
 
         public async Task<TransacaoResponseDTO> RealizarTransacao(TransacaoRequestDTO request)
-        {
+        {           
             var contaOrigem = await _contaRepo.GetContaById(request.IdContaOrigem);
             if (contaOrigem == null) throw new Exception("Conta de Origem não encontrada.");
 
@@ -92,7 +92,7 @@ namespace Sistema_Bancario_Sprint3.Services.transacao
             };
 
             await _transacaoRepo.PostTransacao(novaTransacao);
-
+            
             return new TransacaoResponseDTO
             {
                 Id = novaTransacao.Id,
