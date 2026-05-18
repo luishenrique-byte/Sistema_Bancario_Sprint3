@@ -13,6 +13,7 @@ namespace Sistema_Bancario_Sprint3.Data
         public DbSet<Conta> Contas { get; set; }
         public DbSet<TipoConta> TipoContas { get; set; }
         public DbSet<Transacao> Transacoes { get; set; }
+        public DbSet<Usuario> Usuarios { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
