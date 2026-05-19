@@ -1,14 +1,16 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Sistema_Bancario_Sprint3.Data;
 using Sistema_Bancario_Sprint3.Repositories.cliente;
 using Sistema_Bancario_Sprint3.Repositories.conta;
 using Sistema_Bancario_Sprint3.Repositories.transacao;
+using Sistema_Bancario_Sprint3.Repositories.usuario;
 using Sistema_Bancario_Sprint3.Services.cliente;
 using Sistema_Bancario_Sprint3.Services.conta;
+using Sistema_Bancario_Sprint3.Services.login;
 using Sistema_Bancario_Sprint3.Services.transacao;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,7 +34,10 @@ builder.Services.AddScoped<IContaService, ContaService>();
 builder.Services.AddScoped<ITransacaoRepository, TransacaoRepository>();
 builder.Services.AddScoped<ITransacaoService, TransacaoService>();
 
-var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"] ?? "ChaveSuperSecretaEComPeloMenos16Caracteres");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -78,8 +83,8 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-app.UseStaticFiles();
 app.UseDefaultFiles();
+app.UseStaticFiles();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
