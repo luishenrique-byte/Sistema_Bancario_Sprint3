@@ -51,9 +51,15 @@
         <input type="password" id="senha" placeholder="Senha (123456)">
         <p id="error-msg" class="error">Usuário ou senha inválidos</p>
         <button onclick="fazerLogin()">Entrar</button>
+        <button onclick="cadastrar()">Cadastrar</button>
     </div>
 
-    <script>async function fazerLogin() {
+    <script>
+        async function cadastrar() {
+            
+            alert("Funcionalidade de cadastro ainda não implementada.");
+        }
+        async function fazerLogin() {
             const usuario = document.getElementById('usuario').value;
             const senha = document.getElementById('senha').value;
             const errorMsg = document.getElementById('error-msg');

@@ -1,9 +1,11 @@
-﻿using System.Text;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using Sistema_Bancario_Sprint3.DTOs.login;
 using Sistema_Bancario_Sprint3.Repositories.usuario;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using BCrypt.Net;
+using Sistema_Bancario_Sprint3.Models.ENUM;
 
 namespace Sistema_Bancario_Sprint3.Services.login
 {
@@ -26,7 +28,7 @@ namespace Sistema_Bancario_Sprint3.Services.login
 
             // 2. Se não achar ou se a senha estiver incorreta
             // (Substitua por BCrypt.Net.BCrypt.Verify(request.Senha, usuario.SenhaHash) quando usar hash real)
-            if (usuario == null || usuario.SenhaHash != request.Senha)
+            if (usuario == null || BCrypt.Net.BCrypt.Verify(request.Senha, usuario.SenhaHash))
             {
                 throw new Exception("Credenciais inválidas");
             }
@@ -64,6 +66,23 @@ namespace Sistema_Bancario_Sprint3.Services.login
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        public async Task RegistrarAsync(string email, string senha)
+        {
+            // Verificar se o usuário já existe
+            var usuarioExistente = await _usuarioRepository.GetByEmailAsync(email);
+            if (usuarioExistente != null)
+            {
+                throw new Exception("Usuário já existe");
+            }
+            // Criar um novo usuário
+            var novoUsuario = new Models.Usuario
+            {
+                Email = email,
+                SenhaHash = BCrypt.Net.BCrypt.HashPassword(senha) // Substitua por BCrypt.Net.BCrypt.HashPassword(senha) para hash real
+            };
+            await _usuarioRepository.AddAsync(novoUsuario);
         }
     }
 }

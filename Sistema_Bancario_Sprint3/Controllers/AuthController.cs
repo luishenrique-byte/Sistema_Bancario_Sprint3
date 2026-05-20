@@ -13,17 +13,22 @@ namespace Sistema_Bancario_Sprint3.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
+
+
+        //COMENTE TUDO E DESCOMENTE SÓ ESSE TRECHO
+        // PARA RODAR COM LOGIN PADRÃO
+
+        //VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
         //private readonly IConfiguration _configuration;
 
         //public AuthController(IConfiguration configuration)
         //{
         //    _configuration = configuration;
         //}
-        public AuthController(IAuthService authService)
-        {
-            _authService = authService;
-        }
-
         //[HttpPost("login")]
         //public async Task<IActionResult> Login([FromBody] LoginRequestDTO login)
         //{
@@ -60,7 +65,7 @@ namespace Sistema_Bancario_Sprint3.Controllers
         //    });
 
         //}
-
+        //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)
@@ -77,6 +82,20 @@ namespace Sistema_Bancario_Sprint3.Controllers
             catch (Exception ex)
             {
                 return Unauthorized(new { mensagem = ex.Message });
+            }
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] LoginRequestDTO request)
+        {
+            try
+            {
+                await _authService.RegistrarAsync(request.Usuario, request.Senha);
+                return Ok(new { mensagem = "Usuário registrado com sucesso" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensagem = ex.Message });
             }
         }
     }
