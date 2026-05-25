@@ -17,7 +17,7 @@ namespace Sistema_Bancario_Sprint3.Controllers
         }
 
         [Authorize]
-        [HttpPost]
+        [HttpPost("post")]
         public async Task<IActionResult> PostTransacao(TransacaoRequestDTO request)
         {            
             try

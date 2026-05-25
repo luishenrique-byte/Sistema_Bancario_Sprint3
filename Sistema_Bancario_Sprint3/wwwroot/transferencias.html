@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>uBank | Transferências</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ubank: {
+                            light: '#8B5CF6',
+                            DEFAULT: '#6D28D9',
+                            dark: '#4C1D95'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 flex h-screen font-sans text-gray-800 overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 text-white flex flex-col justify-between hidden md:flex">
+        <div>
+            <div class="p-6 flex items-center gap-3 border-b border-gray-800">
+                <i class="fa-solid fa-building-columns text-ubank text-2xl"></i>
+                <h1 class="text-2xl font-bold tracking-wider">uBank<span class="text-ubank">.</span></h1>
+            </div>
+
+            <nav class="p-4 space-y-2 mt-4">
+                <a href="home.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-house"></i> Início
+                </a>
+                <a href="extrato.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-list-ul"></i> Extrato
+                </a>
+                <a href="transferencias-v2.html" class="flex items-center gap-3 bg-ubank text-white px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-money-bill-transfer"></i> Transferências
+                </a>
+                <a href="pix.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-brands fa-pix"></i> Área Pix
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-400 hover:text-red-300 hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair da Conta
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-y-auto">
+
+        <header class="bg-white shadow-sm px-8 py-6 flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Transferências</h2>
+                <p class="text-sm text-gray-500 mt-1">Realize transferências entre suas contas.</p>
+            </div>
+
+            <div class="h-12 w-12 bg-ubank rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md cursor-pointer hover:bg-ubank-dark transition">
+                C
+            </div>
+        </header>
+
+        <div class="p-8 max-w-4xl mx-auto w-full">
+
+            <!-- Cards de Informação -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 font-semibold">Saldo Disponível</p>
+                    <p class="text-2xl font-bold text-gray-900 mt-2">
+                        R$ <span id="saldo-disponivel" class="blur-sm">0,00</span>
+                    </p>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 font-semibold">Transações Hoje</p>
+                    <p class="text-2xl font-bold text-ubank mt-2" id="transacoes-hoje">0</p>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-500 font-semibold">Total Transferido</p>
+                    <p class="text-2xl font-bold text-green-600 mt-2">
+                        R$ <span id="total-transferido">0,00</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Formulário Principal -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-6">
+                    <i class="fa-solid fa-arrow-right-arrow-left mr-2 text-ubank"></i>
+                    Transferência entre Contas
+                </h3>
+
+                <form id="form-transferencia" onsubmit="executarTransferencia(event)" class="space-y-6">
+
+                    <!-- Seleção de Conta de Origem -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fa-solid fa-wallet mr-1 text-ubank"></i>Conta de Origem
+                        </label>
+                        <select id="conta-origem" required
+                                class="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition"
+                                onchange="atualizarSaldoDisponivel()">
+                            <option value="">Selecione sua conta...</option>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-2">
+                            Saldo: R$ <span id="saldo-conta-origem" class="font-semibold">0,00</span>
+                        </p>
+                    </div>
+
+                    <!-- Tipo de Transferência -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">
+                            <i class="fa-solid fa-arrow-right mr-1 text-ubank"></i>Tipo de Transferência
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-ubank transition has-[:checked]:border-ubank has-[:checked]:bg-ubank/5">
+                                <input type="radio" name="tipo-transferencia" value="interna" class="sr-only" onchange="mostrarFormularioTransferencia('interna')" checked>
+                                <i class="fa-solid fa-building mr-3 text-ubank"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Interna</p>
+                                    <p class="text-xs text-gray-500">Entre suas contas</p>
+                                </div>
+                            </label>
+
+                            <label class="relative flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-ubank transition has-[:checked]:border-ubank has-[:checked]:bg-ubank/5">
+                                <input type="radio" name="tipo-transferencia" value="tef" class="sr-only" onchange="mostrarFormularioTransferencia('tef')">
+                                <i class="fa-solid fa-arrow-right-arrow-left mr-3 text-ubank"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-800">TEF (Outro Banco)</p>
+                                    <p class="text-xs text-gray-500">Tarifa: R$ 5,00</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Formulário Transferência Interna -->
+                    <div id="form-interna-campos" class="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fa-solid fa-user-plus mr-1 text-ubank"></i>Selecione a Conta Destino
+                            </label>
+                            <select id="conta-destino-interna"
+                                    class="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition">
+                                <option value="">Selecione conta de destino...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Formulário TEF -->
+                    <div id="form-tef-campos" class="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nome do Beneficiário</label>
+                                <input type="text" id="tef-nome"
+                                       class="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition"
+                                       placeholder="Nome completo">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">CPF/CNPJ</label>
+                                <input type="text" id="tef-cpf"
+                                       class="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition"
+                                       placeholder="000.000.000-00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Banco</label>
+                                <select id="tef-banco"
+                                        class="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition">
+                                    <option value="">Selecione o banco</option>
+                                    <option value="001">Banco do Brasil (001)</option>
+                                    <option value="033">Santander (033)</option>
+                                    <option value="104">Caixa Econômica (104)</option>
+                                    <option value="237">Bradesco (237)</option>
+                                    <option value="341">Itaú (341)</option>
+                                    <option value="077">Inter (077)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Agência</label>
+                                <input type="text" id="tef-agencia"
+                                       class="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition"
+                                       placeholder="0001">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Número da Conta</label>
+                                <input type="text" id="tef-conta"
+                                       class="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition"
+                                       placeholder="123456">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo de Conta</label>
+                                <select id="tef-tipo-conta"
+                                        class="w-full bg-white border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition">
+                                    <option value="corrente">Corrente</option>
+                                    <option value="poupanca">Poupança</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Valor e Descrição (Comum) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i class="fa-solid fa-money-bill mr-1 text-ubank"></i>Valor (R$)
+                            </label>
+                            <input type="number" id="valor-transferencia" min="0.01" step="0.01" required
+                                   class="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition"
+                                   placeholder="0,00"
+                                   onchange="atualizarResumo()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Descrição (Opcional)</label>
+                            <input type="text" id="descricao-transferencia"
+                                   class="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition"
+                                   placeholder="Descrição...">
+                        </div>
+                    </div>
+
+                    <!-- Resumo -->
+                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p class="text-xs text-blue-600 font-semibold mb-2">RESUMO DA TRANSFERÊNCIA</p>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Valor:</span>
+                                <span class="font-semibold text-gray-900">R$ <span id="resumo-valor">0,00</span></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Tarifa:</span>
+                                <span class="font-semibold text-gray-900">R$ <span id="resumo-tarifa">0,00</span></span>
+                            </div>
+                            <div class="border-t border-blue-200 pt-2 flex justify-between">
+                                <span class="text-gray-700 font-semibold">Total:</span>
+                                <span class="font-bold text-lg text-blue-600">R$ <span id="resumo-total">0,00</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                            class="w-full bg-ubank hover:bg-ubank-dark text-white font-bold py-4 rounded-xl shadow-lg shadow-ubank/20 transition-all active:scale-[0.98] flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> Confirmar Transferência
+                    </button>
+                </form>
+            </div>
+
+            <!-- Histórico Recente -->
+            <div class="mt-8 bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-800">
+                        <i class="fa-solid fa-clock-rotate-left mr-2 text-ubank"></i>Histórico de Transferências
+                    </h3>
+                    <a href="extrato.html" class="text-sm font-medium text-ubank hover:text-ubank-dark transition">Ver extrato completo</a>
+                </div>
+
+                <div id="historico-transferencias" class="space-y-3">
+                    <p class="text-gray-500 text-center py-4">Carregando histórico...</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const API_BASE = 'https://localhost:7044/api';
+
+        if (!token) window.location.href = 'login.html';
+
+        let contasDisponiveis = [];
+        let tipoTransferenciaAtual = 'interna';
+
+        // Inicializar
+        async function inicializar() {
+            await carregarContas();
+            await carregarHistorico();
+        }
+
+        async function carregarContas() {
+            try {
+                const response = await fetch(`${API_BASE}/Contas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Erro ao carregar contas');
+
+                const contas = await response.json();
+                contasDisponiveis = contas;
+
+                // Preencher selects
+                const selectOrigem = document.getElementById('conta-origem');
+                const selectDestino = document.getElementById('conta-destino-interna');
+
+                selectOrigem.innerHTML = '<option value="">Selecione sua conta...</option>';
+                selectDestino.innerHTML = '<option value="">Selecione conta de destino...</option>';
+
+                contas.forEach(conta => {
+                    const option = document.createElement('option');
+                    option.value = conta.id;
+                    option.textContent = `${conta.numeroConta} - ${conta.agencia} (R$ ${conta.saldo.toFixed(2)})`;
+                    selectOrigem.appendChild(option);
+
+                    const optionDestino = document.createElement('option');
+                    optionDestino.value = conta.id;
+                    optionDestino.textContent = `${conta.numeroConta} - ${conta.agencia}`;
+                    selectDestino.appendChild(optionDestino);
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao carregar contas.');
+            }
+        }
+
+        function atualizarSaldoDisponivel() {
+            const contaId = document.getElementById('conta-origem').value;
+            const conta = contasDisponiveis.find(c => c.id == contaId);
+            if (conta) {
+                document.getElementById('saldo-conta-origem').textContent = conta.saldo.toFixed(2);
+                document.getElementById('saldo-disponivel').textContent = conta.saldo.toFixed(2);
+            }
+            atualizarResumo();
+        }
+
+        function mostrarFormularioTransferencia(tipo) {
+            tipoTransferenciaAtual = tipo;
+            const formInterna = document.getElementById('form-interna-campos');
+            const formTef = document.getElementById('form-tef-campos');
+
+            if (tipo === 'interna') {
+                formInterna.classList.remove('hidden');
+                formTef.classList.add('hidden');
+            } else {
+                formInterna.classList.add('hidden');
+                formTef.classList.remove('hidden');
+            }
+            atualizarResumo();
+        }
+
+        function atualizarResumo() {
+            const valor = parseFloat(document.getElementById('valor-transferencia').value) || 0;
+            const tarifa = tipoTransferenciaAtual === 'tef' ? 5.00 : 0;
+            const total = valor + tarifa;
+
+            document.getElementById('resumo-valor').textContent = valor.toFixed(2);
+            document.getElementById('resumo-tarifa').textContent = tarifa.toFixed(2);
+            document.getElementById('resumo-total').textContent = total.toFixed(2);
+        }
+
+        async function executarTransferencia(event) {
+            event.preventDefault();
+
+            const btn = event.target.querySelector('button');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+            btn.disabled = true;
+
+            try {
+                const idContaOrigem = document.getElementById('conta-origem').value;
+                const valor = parseFloat(document.getElementById('valor-transferencia').value);
+
+                let payload = {
+                    idContaOrigem: parseInt(idContaOrigem),
+                    valor: valor,
+                    descricao: document.getElementById('descricao-transferencia').value
+                };
+
+                if (tipoTransferenciaAtual === 'interna') {
+                    const idContaDestino = document.getElementById('conta-destino-interna').value;
+                    if (!idContaDestino) throw new Error('Selecione conta de destino');
+
+                    payload.idContaDestino = parseInt(idContaDestino);
+                    payload.tipo = 2; // Transferência
+
+                } else {
+                    // TEF (para backend futuro)
+                    if (!document.getElementById('tef-nome').value) throw new Error('Preencha todos os dados do beneficiário');
+                    payload.tipo = 2;
+                    payload.nomeBeneficiario = document.getElementById('tef-nome').value;
+                    payload.cpfCnpj = document.getElementById('tef-cpf').value;
+                    payload.banco = document.getElementById('tef-banco').value;
+                    payload.agencia = document.getElementById('tef-agencia').value;
+                    payload.conta = document.getElementById('tef-conta').value;
+                }
+
+                const response = await fetch(`${API_BASE}/Transacao/post`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Erro na transferência');
+                }
+
+                alert('Transferência realizada com sucesso!');
+                document.getElementById('form-transferencia').reset();
+                await carregarContas();
+                await carregarHistorico();
+
+            } catch (err) {
+                alert('Erro: ' + err.message);
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        async function carregarHistorico() {
+            try {
+                const contaId = document.getElementById('conta-origem').value;
+                if (!contaId) {
+                    document.getElementById('historico-transferencias').innerHTML = 
+                        '<p class="text-gray-500 text-center py-4">Selecione uma conta para ver o histórico</p>';
+                    return;
+                }
+
+                const response = await fetch(`${API_BASE}/Transacao/extrato/${contaId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Erro ao carregar extrato');
+
+                const transacoes = await response.json();
+                const historico = document.getElementById('historico-transferencias');
+
+                if (transacoes.length === 0) {
+                    historico.innerHTML = '<p class="text-gray-500 text-center py-4">Nenhuma transferência realizada</p>';
+                    return;
+                }
+
+                historico.innerHTML = transacoes.slice(0, 5).map(t => `
+                    <div class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg transition border border-gray-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full ${t.tipo === 2 ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'} flex items-center justify-center">
+                                <i class="fa-solid ${t.tipo === 2 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800 text-sm">${t.tipo === 2 ? 'Transferência Enviada' : 'Transferência Recebida'}</p>
+                                <p class="text-xs text-gray-500">${new Date(t.dataHora).toLocaleDateString('pt-BR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</p>
+                            </div>
+                        </div>
+                        <p class="font-bold ${t.tipo === 2 ? 'text-red-600' : 'text-green-600'}">
+                            ${t.tipo === 2 ? '-' : '+'} R$ ${t.valor.toFixed(2)}
+                        </p>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('historico-transferencias').innerHTML = 
+                    '<p class="text-red-500 text-center py-4">Erro ao carregar histórico</p>';
+            }
+        }
+
+        function fazerLogout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        // Event listeners
+        document.getElementById('conta-origem').addEventListener('change', carregarHistorico);
+
+        inicializar();
+    </script>
+
+</body>
+</html>
