@@ -12,11 +12,6 @@ namespace Sistema_Bancario_Sprint3.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService _authService;
-        public AuthController(IAuthService authService)
-        {
-            _authService = authService;
-        }
 
 
         //COMENTE TUDO E DESCOMENTE SÓ ESSE TRECHO
@@ -66,6 +61,13 @@ namespace Sistema_Bancario_Sprint3.Controllers
 
         //}
         //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        private readonly IAuthService _authService;
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO request)

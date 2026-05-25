@@ -28,7 +28,7 @@ namespace Sistema_Bancario_Sprint3.Services.login
 
             // 2. Se não achar ou se a senha estiver incorreta
             // (Substitua por BCrypt.Net.BCrypt.Verify(request.Senha, usuario.SenhaHash) quando usar hash real)
-            if (usuario == null || BCrypt.Net.BCrypt.Verify(request.Senha, usuario.SenhaHash))
+            if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Senha, usuario.SenhaHash))
             {
                 throw new Exception("Credenciais inválidas");
             }
@@ -39,7 +39,8 @@ namespace Sistema_Bancario_Sprint3.Services.login
             return new LoginResponseDTO
             {
                 Token = token,
-                Mensagem = "Login bem-sucedido!"
+                Mensagem = "Login bem-sucedido!",
+                PrecisaCompletarCadastro = usuario.IdCliente == null
             };
         }
 

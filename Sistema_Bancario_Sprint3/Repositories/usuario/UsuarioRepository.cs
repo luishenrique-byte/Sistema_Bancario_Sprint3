@@ -24,5 +24,11 @@ namespace Sistema_Bancario_Sprint3.Repositories.usuario
         {
             return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
         }
+
+        public async Task UpdateAsync(Usuario usuario)
+        {
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+        }
     }
 }

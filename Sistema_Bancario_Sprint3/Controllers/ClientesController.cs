@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Sistema_Bancario_Sprint3.Data;
 using Sistema_Bancario_Sprint3.DTOs.cliente;
-using Sistema_Bancario_Sprint3.Models;
-using Sistema_Bancario_Sprint3.Repositories;
 using Sistema_Bancario_Sprint3.Services.cliente;
 
 namespace Sistema_Bancario_Sprint3.Controllers
 {
-    [Route("api/clientes")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ClientesController : ControllerBase
     {
@@ -44,6 +40,18 @@ namespace Sistema_Bancario_Sprint3.Controllers
         [HttpPost]
         public async Task<IActionResult> PostCliente(ClienteRequestDTO request)
         {
+            // 1. O C# abre o Token JWT e pega o E-mail com 100% de segurança
+            var emailUsuario = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrEmpty(emailUsuario))
+            {
+                return Unauthorized(new { mensagem = "Token inválido ou sem e-mail." });
+            }
+
+            // 2. Você injeta o e-mail seguro direto no DTO (mesmo que o front não tenha enviado)
+            request.Email = emailUsuario;
+
+            // 3. Continua o fluxo normal para salvar no banco
             var clienteCriado = await _service.CriarCliente(request);
             return CreatedAtAction(nameof(GetCliente), new { id = clienteCriado.Id }, clienteCriado);
         }

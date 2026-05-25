@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>uBank | Minha Conta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        // Configuração de cores personalizadas do uBank no Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ubank: {
+                            light: '#8B5CF6', // Roxo claro
+                            DEFAULT: '#6D28D9', // Roxo principal
+                            dark: '#4C1D95' // Roxo escuro
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 flex h-screen font-sans text-gray-800 overflow-hidden">
+
+    <aside class="w-64 bg-gray-900 text-white flex flex-col justify-between hidden md:flex">
+        <div>
+            <div class="p-6 flex items-center gap-3 border-b border-gray-800">
+                <i class="fa-solid fa-building-columns text-ubank text-2xl"></i>
+                <h1 class="text-2xl font-bold tracking-wider">uBank<span class="text-ubank">.</span></h1>
+            </div>
+
+            <nav class="p-4 space-y-2 mt-4">
+                <a href="#" class="flex items-center gap-3 bg-ubank text-white px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-house"></i> Início
+                </a>
+                <a href="#" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-list-ul"></i> Extrato
+                </a>
+                <a href="#" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-money-bill-transfer"></i> Transferências
+                </a>
+                <a href="#" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-brands fa-pix"></i> Área Pix
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-400 hover:text-red-300 hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair da Conta
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col overflow-y-auto">
+
+        <header class="bg-white shadow-sm px-8 py-6 flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Olá, <span id="nome-usuario" class="text-ubank">Cliente</span>!</h2>
+                <p class="text-sm text-gray-500 mt-1">Bem-vindo(a) de volta ao seu painel financeiro.</p>
+            </div>
+
+            <div class="h-12 w-12 bg-ubank rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md cursor-pointer hover:bg-ubank-dark transition">
+                C
+            </div>
+        </header>
+
+        <div class="p-8 max-w-6xl mx-auto w-full">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-ubank"></div>
+
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-2 text-gray-500 font-medium">
+                            <i class="fa-solid fa-wallet text-ubank"></i> Conta Corrente
+                        </div>
+                        <button onclick="toggleSaldo()" class="text-gray-400 hover:text-gray-600 transition">
+                            <i id="icone-olho" class="fa-solid fa-eye-slash text-xl"></i>
+                        </button>
+                    </div>
+
+                    <h3 class="text-4xl font-bold text-gray-800 mt-2 flex items-center gap-2">
+                        R$ <span id="valor-saldo" class="blur-md select-none transition-all duration-300">0,00</span>
+                    </h3>
+                    <p class="text-sm text-gray-400 mt-4">Agência: <span id="info-agencia">----</span> | Conta: <span id="info-conta">----</span></p>
+                </div>
+
+                <div class="bg-gray-900 rounded-2xl p-6 shadow-sm text-white relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-ubank rounded-full blur-3xl opacity-50"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 text-gray-400 font-medium mb-4">
+                            <i class="fa-regular fa-credit-card text-ubank-light"></i> Cartão de Crédito uBank
+                        </div>
+
+                        <p class="text-sm text-gray-400 mb-1">Limite disponível</p>
+                        <h3 class="text-3xl font-bold mt-1">
+                            R$ <span id="valor-limite" class="blur-md select-none transition-all duration-300">0,00</span>
+                        </h3>
+
+                        <div class="w-full bg-gray-700 rounded-full h-1.5 mt-5">
+                            <div class="bg-ubank-light h-1.5 rounded-full" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-gray-800">Últimas Movimentações</h3>
+                    <a href="#" class="text-sm font-medium text-ubank hover:text-ubank-dark transition">Ver extrato completo</a>
+                </div>
+
+                <div class="space-y-4" id="lista-transacoes">
+
+                    <div class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg transition">
+                        <div class="flex items-center gap-4">
+                            <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800 text-sm">Pix Recebido</p>
+                                <p class="text-xs text-gray-500">Hoje, 14:30 - João Silva</p>
+                            </div>
+                        </div>
+                        <p class="font-bold text-green-600">+ R$ 150,00</p>
+                    </div>
+
+                    <div class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg transition">
+                        <div class="flex items-center gap-4">
+                            <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                                <i class="fa-solid fa-arrow-up"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800 text-sm">Pagamento Boleto</p>
+                                <p class="text-xs text-gray-500">Ontem, 09:15 - Celpe S.A</p>
+                            </div>
+                        </div>
+                        <p class="font-bold text-red-600">- R$ 120,50</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // 1. SEGURANÇA: Verifica se o usuário tem o Token JWT no localStorage
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            // Se não tiver token, chuta o usuário de volta pro login
+            window.location.href = 'login.html';
+        }
+
+        // 2. Lógica do Olhinho (Mostrar/Esconder Saldo)
+        let saldoVisivel = false;
+
+        function toggleSaldo() {
+            saldoVisivel = !saldoVisivel;
+            const icone = document.getElementById('icone-olho');
+            const saldoCorrente = document.getElementById('valor-saldo');
+            const saldoLimite = document.getElementById('valor-limite');
+
+            if (saldoVisivel) {
+                icone.classList.remove('fa-eye-slash');
+                icone.classList.add('fa-eye');
+                saldoCorrente.classList.remove('blur-md', 'select-none');
+                saldoLimite.classList.remove('blur-md', 'select-none');
+            } else {
+                icone.classList.remove('fa-eye');
+                icone.classList.add('fa-eye-slash');
+                saldoCorrente.classList.add('blur-md', 'select-none');
+                saldoLimite.classList.add('blur-md', 'select-none');
+            }
+        }
+
+        // 3. Lógica de Logout
+        function fazerLogout() {
+            // Remove o token do navegador
+            localStorage.removeItem('token');
+            // Redireciona para o login
+            window.location.href = 'login.html';
+        }
+
+        // 4. CHAMAR A API PARA PEGAR OS DADOS REAIS (Exemplo de como você vai fazer)
+        async function carregarDadosDoBanco() {
+            try {
+                // Aqui você vai colocar a rota real da sua API que retorna os dados da conta
+                // const resposta = await fetch('https://localhost:7044/api/Conta/minha-conta', {
+                //     method: 'GET',
+                //     headers: {
+                //         'Authorization': `Bearer ${token}` // O Token JWT sendo enviado aqui!
+                //     }
+                // });
+
+                // const dados = await resposta.json();
+
+                // Exemplo de como preencher o HTML com os dados que vêm do C#:
+                // document.getElementById('valor-saldo').innerText = dados.saldo.toFixed(2);
+                // document.getElementById('info-agencia').innerText = dados.agencia;
+                // document.getElementById('info-conta').innerText = dados.numeroConta;
+                // document.getElementById('valor-limite').innerText = dados.limiteCredito.toFixed(2);
+
+            } catch (error) {
+                console.error("Erro ao carregar dados:", error);
+            }
+        }
+
+        // Inicia a busca de dados assim que a página carrega
+        // carregarDadosDoBanco();
+    </script>
+</body>
+</html>

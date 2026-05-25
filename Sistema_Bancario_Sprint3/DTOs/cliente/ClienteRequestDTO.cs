@@ -11,7 +11,7 @@ namespace Sistema_Bancario_Sprint3.DTOs.cliente
         
         [EmailAddress(ErrorMessage = "Email inválido.")]
         [MaxLength(100)]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [MaxLength(20)]
         public string Telefone { get; set; }

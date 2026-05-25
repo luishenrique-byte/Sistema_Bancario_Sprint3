@@ -1,15 +1,18 @@
 ﻿using Sistema_Bancario_Sprint3.DTOs.cliente;
 using Sistema_Bancario_Sprint3.Models;
 using Sistema_Bancario_Sprint3.Repositories.cliente;
+using Sistema_Bancario_Sprint3.Repositories.usuario;
 
 namespace Sistema_Bancario_Sprint3.Services.cliente
 {
     public class ClienteService : IClienteService
     {
         private readonly IClienteRepository _repository;
-        public ClienteService(IClienteRepository repository)
+        private readonly IUsuarioRepository _usuarioRepository;
+        public ClienteService(IClienteRepository repository, IUsuarioRepository usuarioRepository)
         {
             _repository = repository;
+            _usuarioRepository = usuarioRepository;
         }
         
         public async Task<IEnumerable<ClienteResponseDTO>> ObterTodos()
@@ -54,6 +57,14 @@ namespace Sistema_Bancario_Sprint3.Services.cliente
                 DataCadastro = DateTime.Now
             };
             await _repository.PostCliente(novoCliente);
+
+            var usuario = await _usuarioRepository.GetByEmailAsync(novoCliente.Email);
+            if (usuario != null)
+            {
+                usuario.IdCliente = novoCliente.Id;
+                await _usuarioRepository.UpdateAsync(usuario);
+            }
+
             return new ClienteResponseDTO
             {
                 Id = novoCliente.Id,
