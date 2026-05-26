@@ -37,13 +37,16 @@
                 <a href="home.html" class="flex items-center gap-3 bg-ubank text-white px-4 py-3 rounded-lg font-medium transition">
                     <i class="fa-solid fa-house"></i> Início
                 </a>
-                <a href="#" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                <a href="extrato.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
                     <i class="fa-solid fa-list-ul"></i> Extrato
                 </a>
                 <a href="transferencias.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
                     <i class="fa-solid fa-money-bill-transfer"></i> Transferências
                 </a>
-                <a href="#" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                <a href="depositos-saques.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> Depósitos e Saques
+                </a>
+                <a href="pix.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
                     <i class="fa-brands fa-pix"></i> Área Pix
                 </a>
             </nav>
@@ -65,7 +68,7 @@
             </div>
 
             <div class="h-12 w-12 bg-ubank rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md cursor-pointer hover:bg-ubank-dark transition">
-                C
+                <span id="avatar-letra">C</span>
             </div>
         </header>
 
@@ -78,7 +81,7 @@
 
                     <div class="flex justify-between items-center mb-4">
                         <div class="flex items-center gap-2 text-gray-500 font-medium">
-                            <i class="fa-solid fa-wallet text-ubank"></i> Conta Corrente
+                            <i class="fa-solid fa-wallet text-ubank"></i> <span id="tipo-conta-label">Conta Corrente</span>
                         </div>
                         <button onclick="toggleSaldo()" class="text-gray-400 hover:text-gray-600 transition">
                             <i id="icone-olho" class="fa-solid fa-eye-slash text-xl"></i>
@@ -88,7 +91,7 @@
                     <h3 class="text-4xl font-bold text-gray-800 mt-2 flex items-center gap-2">
                         R$ <span id="valor-saldo" class="blur-md select-none transition-all duration-300">0,00</span>
                     </h3>
-                    <p class="text-sm text-gray-400 mt-4">Agência: <span id="info-agencia">----</span> | Conta: <span id="info-conta">----</span></p>
+                    <p class="text-sm text-gray-400 mt-4">Agência: <span id="info-agencia" class="blur-md select-none transition-all duration-300">----</span> | Conta: <span id="info-conta" class="blur-md select-none transition-all duration-300">----</span></p>
                 </div>
 
                 <div class="bg-gray-900 rounded-2xl p-6 shadow-sm text-white relative overflow-hidden">
@@ -96,17 +99,19 @@
 
                     <div class="relative z-10">
                         <div class="flex items-center gap-2 text-gray-400 font-medium mb-4">
-                            <i class="fa-regular fa-credit-card text-ubank-light"></i> Cartão de Crédito uBank
+                            <i id="icone-secao-credito" class="fa-regular fa-credit-card text-ubank-light"></i>
+                            <span id="label-secao-credito">Cartão de Crédito uBank</span>
                         </div>
 
-                        <p class="text-sm text-gray-400 mb-1">Limite disponível</p>
+                        <p class="text-sm text-gray-400 mb-1" id="sub-secao-credito">Limite disponível</p>
                         <h3 class="text-3xl font-bold mt-1">
-                            R$ <span id="valor-limite" class="blur-md select-none transition-all duration-300">0,00</span>
+                            <span id="prefixo-limite">R$ </span><span id="valor-limite" class="blur-md select-none transition-all duration-300">0,00</span>
                         </h3>
 
                         <div class="w-full bg-gray-700 rounded-full h-1.5 mt-5">
-                            <div class="bg-ubank-light h-1.5 rounded-full" style="width: 100%"></div>
+                            <div id="barra-credito" class="bg-ubank-light h-1.5 rounded-full transition-all duration-500" style="width: 100%"></div>
                         </div>
+                        <p class="text-xs text-gray-500 mt-2" id="label-credito-usado"></p>
                     </div>
                 </div>
             </div>
@@ -114,7 +119,7 @@
             <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-lg font-bold text-gray-800">Últimas Movimentações</h3>
-                    <a href="#" class="text-sm font-medium text-ubank hover:text-ubank-dark transition">Ver extrato completo</a>
+                    <a href="extrato.html" class="text-sm font-medium text-ubank hover:text-ubank-dark transition">Ver extrato completo</a>
                 </div>
 
                 <div class="space-y-4" id="lista-transacoes">
@@ -160,62 +165,114 @@
             window.location.href = 'login.html';
         }
 
-        // 2. Lógica do Olhinho (Mostrar/Esconder Saldo)
+        const API_BASE = 'https://localhost:7044/api';
+
+        // 2. Lógica do Olhinho (Mostrar/Esconder Saldo + Agência/Conta)
         let saldoVisivel = false;
 
         function toggleSaldo() {
             saldoVisivel = !saldoVisivel;
             const icone = document.getElementById('icone-olho');
-            const saldoCorrente = document.getElementById('valor-saldo');
-            const saldoLimite = document.getElementById('valor-limite');
+            const els = [
+                document.getElementById('valor-saldo'),
+                document.getElementById('valor-limite'),
+                document.getElementById('info-agencia'),
+                document.getElementById('info-conta'),
+            ];
 
             if (saldoVisivel) {
-                icone.classList.remove('fa-eye-slash');
-                icone.classList.add('fa-eye');
-                saldoCorrente.classList.remove('blur-md', 'select-none');
-                saldoLimite.classList.remove('blur-md', 'select-none');
+                icone.classList.replace('fa-eye-slash', 'fa-eye');
+                els.forEach(el => el.classList.remove('blur-md', 'select-none'));
             } else {
-                icone.classList.remove('fa-eye');
-                icone.classList.add('fa-eye-slash');
-                saldoCorrente.classList.add('blur-md', 'select-none');
-                saldoLimite.classList.add('blur-md', 'select-none');
+                icone.classList.replace('fa-eye', 'fa-eye-slash');
+                els.forEach(el => el.classList.add('blur-md', 'select-none'));
             }
         }
 
         // 3. Lógica de Logout
         function fazerLogout() {
-            // Remove o token do navegador
             localStorage.removeItem('token');
-            // Redireciona para o login
             window.location.href = 'login.html';
         }
 
-        // 4. CHAMAR A API PARA PEGAR OS DADOS REAIS (Exemplo de como você vai fazer)
+        // 4. Carrega dados reais da API
         async function carregarDadosDoBanco() {
             try {
-                // Aqui você vai colocar a rota real da sua API que retorna os dados da conta
-                // const resposta = await fetch('https://localhost:7044/api/Conta/minha-conta', {
-                //     method: 'GET',
-                //     headers: {
-                //         'Authorization': `Bearer ${token}` // O Token JWT sendo enviado aqui!
-                //     }
-                // });
+                // Busca as contas do usuário logado
+                const resConta = await fetch(`${API_BASE}/contas/minhas-contas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
 
-                // const dados = await resposta.json();
+                if (!resConta.ok) return;
 
-                // Exemplo de como preencher o HTML com os dados que vêm do C#:
-                // document.getElementById('valor-saldo').innerText = dados.saldo.toFixed(2);
-                // document.getElementById('info-agencia').innerText = dados.agencia;
-                // document.getElementById('info-conta').innerText = dados.numeroConta;
-                // document.getElementById('valor-limite').innerText = dados.limiteCredito.toFixed(2);
+                const contas = await resConta.json();
+                if (!contas || contas.length === 0) return;
+
+                const conta = contas[0];
+
+                document.getElementById('valor-saldo').innerText = conta.saldo.toFixed(2);
+                document.getElementById('info-agencia').innerText = conta.agencia;
+                document.getElementById('info-conta').innerText = conta.numeroConta;
+
+                // Tipo de conta: 1=Corrente, 2=Poupança, 3=Empresarial
+                const tipoNomes = { 1: 'Conta Corrente', 2: 'Conta Poupança', 3: 'Conta Empresarial' };
+                document.getElementById('tipo-conta-label').innerText = tipoNomes[conta.idTipoConta] ?? 'Conta Corrente';
+
+                if (conta.idTipoConta === 2 && conta.diaRendimento != null) {
+                    // Conta Poupança — mostra taxa de juros e dia de rendimento
+                    document.getElementById('icone-secao-credito').className = 'fa-solid fa-piggy-bank text-ubank-light';
+                    document.getElementById('label-secao-credito').innerText = 'Rendimento Poupança';
+                    document.getElementById('sub-secao-credito').innerText = `Rende todo dia ${conta.diaRendimento} de cada mês`;
+                    document.getElementById('prefixo-limite').style.display = 'none';
+                    document.getElementById('valor-limite').innerText = conta.taxaJuros != null
+                        ? conta.taxaJuros.toFixed(2) + '% ao mês'
+                        : '—';
+                    document.getElementById('barra-credito').style.width = '100%';
+                    document.getElementById('label-credito-usado').innerText = 'Taxa padrão poupança BR';
+
+                } else if (conta.idTipoConta === 3 && conta.limiteCredito != null) {
+                    // Conta Empresarial — crédito disponível = limiteCredito + saldo (saldo pode ser negativo)
+                    const creditoDisponivel = Math.max(0, conta.limiteCredito + conta.saldo);
+                    const creditoUsado = conta.limiteCredito - creditoDisponivel;
+                    const percentualDisponivel = (creditoDisponivel / conta.limiteCredito) * 100;
+
+                    document.getElementById('icone-secao-credito').className = 'fa-solid fa-building text-ubank-light';
+                    document.getElementById('label-secao-credito').innerText = 'Limite Empresarial';
+                    document.getElementById('sub-secao-credito').innerText = 'Crédito disponível para sua empresa';
+                    document.getElementById('valor-limite').innerText = creditoDisponivel.toFixed(2);
+                    document.getElementById('barra-credito').style.width = percentualDisponivel.toFixed(1) + '%';
+
+                    if (creditoUsado > 0) {
+                        document.getElementById('label-credito-usado').innerText =
+                            `R$ ${creditoUsado.toFixed(2)} de R$ ${conta.limiteCredito.toFixed(2)} utilizados`;
+                    }
+                } else {
+                    // Conta Corrente — sem limite de crédito
+                    document.getElementById('sub-secao-credito').innerText = 'Sem limite de crédito';
+                    document.getElementById('valor-limite').innerText = '—';
+                    document.getElementById('barra-credito').style.width = '0%';
+                }
+
+                // Busca o nome do cliente com o idCliente da conta
+                const resCliente = await fetch(`${API_BASE}/Clientes/${conta.idCliente}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!resCliente.ok) return;
+
+                const cliente = await resCliente.json();
+                const primeiroNome = cliente.nome.split(' ')[0];
+                document.getElementById('nome-usuario').innerText = primeiroNome;
+
+                // Atualiza a letra do avatar
+                document.getElementById('avatar-letra').innerText = primeiroNome.charAt(0).toUpperCase();
 
             } catch (error) {
                 console.error("Erro ao carregar dados:", error);
             }
         }
 
-        // Inicia a busca de dados assim que a página carrega
-        // carregarDadosDoBanco();
+        carregarDadosDoBanco();
     </script>
 </body>
 </html>

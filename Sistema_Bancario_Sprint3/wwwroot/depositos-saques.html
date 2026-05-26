@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>uBank | Depósitos e Saques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ubank: {
+                            light: '#8B5CF6',
+                            DEFAULT: '#6D28D9',
+                            dark: '#4C1D95'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 flex h-screen font-sans text-gray-800 overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 text-white flex flex-col justify-between hidden md:flex">
+        <div>
+            <div class="p-6 flex items-center gap-3 border-b border-gray-800">
+                <i class="fa-solid fa-building-columns text-ubank text-2xl"></i>
+                <h1 class="text-2xl font-bold tracking-wider">uBank<span class="text-ubank">.</span></h1>
+            </div>
+
+            <nav class="p-4 space-y-2 mt-4">
+                <a href="home.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-house"></i> Início
+                </a>
+                <a href="extrato.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-list-ul"></i> Extrato
+                </a>
+                <a href="transferencias.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-money-bill-transfer"></i> Transferências
+                </a>
+                <a href="depositos-saques.html" class="flex items-center gap-3 bg-ubank text-white px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> Depósitos e Saques
+                </a>
+                <a href="pix.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-brands fa-pix"></i> Área Pix
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-400 hover:text-red-300 hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair da Conta
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-y-auto">
+
+        <header class="bg-white shadow-sm px-8 py-6 flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Depósitos e Saques</h2>
+                <p class="text-sm text-gray-500 mt-1">Movimente o saldo da sua conta.</p>
+            </div>
+            <div class="h-12 w-12 bg-ubank rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
+                <span id="avatar-letra">C</span>
+            </div>
+        </header>
+
+        <div class="p-8 max-w-2xl mx-auto w-full">
+
+            <!-- Card saldo -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 mb-6 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 font-semibold uppercase tracking-wide">Saldo disponível</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1">R$ <span id="saldo-exibido">0,00</span></p>
+                    <p class="text-xs text-gray-400 mt-1">Ag: <span id="info-agencia">----</span> &nbsp;|&nbsp; Conta: <span id="info-conta">----</span></p>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-ubank/10 flex items-center justify-center">
+                    <i class="fa-solid fa-wallet text-ubank text-xl"></i>
+                </div>
+            </div>
+
+            <!-- Tabs Depósito / Saque -->
+            <div class="flex p-1 bg-gray-100 rounded-xl mb-6 gap-1">
+                <button id="tab-deposito" onclick="mudarAba('deposito')"
+                        class="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-lg bg-white text-green-600 shadow transition-all">
+                    <i class="fa-solid fa-arrow-down"></i> Depósito
+                </button>
+                <button id="tab-saque" onclick="mudarAba('saque')"
+                        class="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 transition-all">
+                    <i class="fa-solid fa-arrow-up"></i> Saque
+                </button>
+            </div>
+
+            <!-- Formulário -->
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+
+                <!-- Cabeçalho dinâmico -->
+                <div id="cabecalho-form" class="flex items-center gap-3 mb-6">
+                    <div id="icone-operacao" class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </div>
+                    <div>
+                        <h3 id="titulo-form" class="text-lg font-bold text-gray-800">Realizar Depósito</h3>
+                        <p id="subtitulo-form" class="text-xs text-gray-400">Adicione saldo à sua conta</p>
+                    </div>
+                </div>
+
+                <form id="form-operacao" onsubmit="executarOperacao(event)" class="space-y-5">
+
+                    <!-- Conta -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fa-solid fa-wallet mr-1 text-ubank"></i>Conta
+                        </label>
+                        <select id="conta-selecionada" required onchange="atualizarSaldo()"
+                                class="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition">
+                            <option value="">Selecione sua conta...</option>
+                        </select>
+                    </div>
+
+                    <!-- Valor -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fa-solid fa-money-bill mr-1 text-ubank"></i>Valor (R$)
+                        </label>
+                        <input type="number" id="valor-operacao" min="0.01" step="0.01" required
+                               class="w-full bg-gray-50 border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition"
+                               placeholder="0,00">
+                    </div>
+
+                    <!-- Aviso saque -->
+                    <div id="aviso-saque" class="hidden p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-sm text-amber-700">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Certifique-se de ter saldo suficiente antes de sacar.</span>
+                    </div>
+
+                    <button type="submit" id="btn-submit"
+                            class="w-full text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] flex justify-center items-center gap-2 bg-green-600 hover:bg-green-700 shadow-green-200">
+                        <i id="icone-btn" class="fa-solid fa-arrow-down"></i>
+                        <span id="texto-btn">Confirmar Depósito</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Histórico -->
+            <div class="mt-6 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h3 class="text-base font-bold text-gray-800 mb-4">
+                    <i class="fa-solid fa-clock-rotate-left mr-2 text-ubank"></i>Últimas Movimentações
+                </h3>
+                <div id="historico" class="space-y-3">
+                    <p class="text-gray-400 text-center py-4 text-sm">Selecione uma conta para ver o histórico</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const API_BASE = 'https://localhost:7044/api';
+
+        if (!token) window.location.href = 'login.html';
+
+        let abaAtual = 'deposito';
+        let contasDisponiveis = [];
+
+        // ── Inicialização ──────────────────────────────────────────────
+        async function inicializar() {
+            try {
+                const res = await fetch(`${API_BASE}/contas/minhas-contas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+
+                contasDisponiveis = await res.json();
+
+                const select = document.getElementById('conta-selecionada');
+                select.innerHTML = '<option value="">Selecione sua conta...</option>';
+
+                contasDisponiveis.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = `Ag ${c.agencia} | Conta ${c.numeroConta}`;
+                    select.appendChild(opt);
+                });
+
+                // Se tiver só uma conta, já seleciona
+                if (contasDisponiveis.length === 1) {
+                    select.value = contasDisponiveis[0].id;
+                    atualizarSaldo();
+                }
+
+                // Carrega nome para o avatar
+                if (contasDisponiveis.length > 0) {
+                    const resCliente = await fetch(`${API_BASE}/Clientes/${contasDisponiveis[0].idCliente}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (resCliente.ok) {
+                        const cliente = await resCliente.json();
+                        document.getElementById('avatar-letra').innerText = cliente.nome.charAt(0).toUpperCase();
+                    }
+                }
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // ── Atualiza card de saldo ao trocar conta ─────────────────────
+        function atualizarSaldo() {
+            const id = document.getElementById('conta-selecionada').value;
+            const conta = contasDisponiveis.find(c => c.id == id);
+            if (conta) {
+                document.getElementById('saldo-exibido').innerText = conta.saldo.toFixed(2);
+                document.getElementById('info-agencia').innerText = conta.agencia;
+                document.getElementById('info-conta').innerText = conta.numeroConta;
+                carregarHistorico(conta.id);
+            }
+        }
+
+        // ── Troca entre Depósito e Saque ───────────────────────────────
+        function mudarAba(aba) {
+            abaAtual = aba;
+            const isDeposito = aba === 'deposito';
+
+            // Tabs
+            document.getElementById('tab-deposito').className = isDeposito
+                ? 'flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-lg bg-white text-green-600 shadow transition-all'
+                : 'flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 transition-all';
+
+            document.getElementById('tab-saque').className = !isDeposito
+                ? 'flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-lg bg-white text-red-500 shadow transition-all'
+                : 'flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-lg text-gray-500 hover:text-gray-700 transition-all';
+
+            // Ícone e textos
+            const iconOp = document.getElementById('icone-operacao');
+            const iconOpi = iconOp.querySelector('i');
+            const iconBtn = document.getElementById('icone-btn');
+
+            if (isDeposito) {
+                iconOp.className = 'w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600';
+                iconOpi.className = 'fa-solid fa-arrow-down';
+                document.getElementById('titulo-form').innerText = 'Realizar Depósito';
+                document.getElementById('subtitulo-form').innerText = 'Adicione saldo à sua conta';
+                document.getElementById('btn-submit').className = 'w-full text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] flex justify-center items-center gap-2 bg-green-600 hover:bg-green-700 shadow-green-200';
+                iconBtn.className = 'fa-solid fa-arrow-down';
+                document.getElementById('texto-btn').innerText = 'Confirmar Depósito';
+                document.getElementById('aviso-saque').classList.add('hidden');
+            } else {
+                iconOp.className = 'w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600';
+                iconOpi.className = 'fa-solid fa-arrow-up';
+                document.getElementById('titulo-form').innerText = 'Realizar Saque';
+                document.getElementById('subtitulo-form').innerText = 'Retire saldo da sua conta';
+                document.getElementById('btn-submit').className = 'w-full text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] flex justify-center items-center gap-2 bg-red-500 hover:bg-red-600 shadow-red-200';
+                iconBtn.className = 'fa-solid fa-arrow-up';
+                document.getElementById('texto-btn').innerText = 'Confirmar Saque';
+                document.getElementById('aviso-saque').classList.remove('hidden');
+            }
+        }
+
+        // ── Executa a operação ─────────────────────────────────────────
+        async function executarOperacao(event) {
+            event.preventDefault();
+
+            const btn = document.getElementById('btn-submit');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+            btn.disabled = true;
+
+            try {
+                const idConta = parseInt(document.getElementById('conta-selecionada').value);
+                const valor = parseFloat(document.getElementById('valor-operacao').value);
+
+                // Deposito = 1, Saque = 2
+                const tipo = abaAtual === 'deposito' ? 1 : 2;
+
+                const res = await fetch(`${API_BASE}/Transacao/post`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        tipo: tipo,
+                        idContaOrigem: idConta,
+                        valor: valor
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || 'Erro ao processar operação');
+                }
+
+                const operacao = abaAtual === 'deposito' ? 'Depósito' : 'Saque';
+                alert(`${operacao} de R$ ${valor.toFixed(2)} realizado com sucesso!`);
+
+                document.getElementById('form-operacao').reset();
+
+                // Atualiza o saldo localmente para refletir na hora
+                const conta = contasDisponiveis.find(c => c.id == idConta);
+                if (conta) {
+                    conta.saldo = abaAtual === 'deposito' ? conta.saldo + valor : conta.saldo - valor;
+                    document.getElementById('saldo-exibido').innerText = conta.saldo.toFixed(2);
+                    carregarHistorico(idConta);
+                }
+
+            } catch (err) {
+                alert('Erro: ' + err.message);
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        // ── Histórico de movimentações ─────────────────────────────────
+        async function carregarHistorico(contaId) {
+            const el = document.getElementById('historico');
+            el.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">Carregando...</p>';
+
+            try {
+                const res = await fetch(`${API_BASE}/Transacao/extrato/${contaId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!res.ok) throw new Error();
+
+                const transacoes = await res.json();
+
+                // Filtra só depósitos (1) e saques (2)
+                const movimentacoes = transacoes
+                    .filter(t => t.tipo === 1 || t.tipo === 2)
+                    .slice(0, 8);
+
+                if (movimentacoes.length === 0) {
+                    el.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">Nenhuma movimentação encontrada</p>';
+                    return;
+                }
+
+                el.innerHTML = movimentacoes.map(t => {
+                    const isDeposito = t.tipo === 1;
+                    const data = new Date(t.dataHora).toLocaleDateString('pt-BR', {
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+                    return `
+                        <div class="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg transition border border-gray-100">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full flex items-center justify-center
+                                    ${isDeposito ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}">
+                                    <i class="fa-solid ${isDeposito ? 'fa-arrow-down' : 'fa-arrow-up'} text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800 text-sm">${isDeposito ? 'Depósito' : 'Saque'}</p>
+                                    <p class="text-xs text-gray-400">${data}</p>
+                                </div>
+                            </div>
+                            <p class="font-bold text-sm ${isDeposito ? 'text-green-600' : 'text-red-500'}">
+                                ${isDeposito ? '+' : '-'} R$ ${t.valor.toFixed(2)}
+                            </p>
+                        </div>`;
+                }).join('');
+
+            } catch {
+                el.innerHTML = '<p class="text-red-400 text-center py-4 text-sm">Erro ao carregar histórico</p>';
+            }
+        }
+
+        function fazerLogout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('conta-selecionada').addEventListener('change', () => {
+            const id = document.getElementById('conta-selecionada').value;
+            if (id) carregarHistorico(id);
+        });
+
+        inicializar();
+    </script>
+
+</body>
+</html>

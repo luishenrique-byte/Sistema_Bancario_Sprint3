@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>uBank | Área Pix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ubank: { light: '#8B5CF6', DEFAULT: '#6D28D9', dark: '#4C1D95' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 flex h-screen font-sans text-gray-800 overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 text-white flex flex-col justify-between hidden md:flex">
+        <div>
+            <div class="p-6 flex items-center gap-3 border-b border-gray-800">
+                <i class="fa-solid fa-building-columns text-ubank text-2xl"></i>
+                <h1 class="text-2xl font-bold tracking-wider">uBank<span class="text-ubank">.</span></h1>
+            </div>
+            <nav class="p-4 space-y-2 mt-4">
+                <a href="home.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-house"></i> Início
+                </a>
+                <a href="extrato.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-list-ul"></i> Extrato
+                </a>
+                <a href="transferencias.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-money-bill-transfer"></i> Transferências
+                </a>
+                <a href="depositos-saques.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> Depósitos e Saques
+                </a>
+                <a href="pix.html" class="flex items-center gap-3 bg-ubank text-white px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-brands fa-pix"></i> Área Pix
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-400 hover:text-red-300 hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair da Conta
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 flex flex-col overflow-y-auto">
+
+        <header class="bg-white shadow-sm px-8 py-6 flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-brands fa-pix text-ubank"></i> Área Pix
+                </h2>
+                <p class="text-sm text-gray-500 mt-1">Transferências instantâneas 24h por dia.</p>
+            </div>
+            <div class="h-12 w-12 bg-ubank rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
+                <span id="avatar-letra">C</span>
+            </div>
+        </header>
+
+        <div class="p-8 max-w-3xl mx-auto w-full">
+
+            <!-- Tabs -->
+            <div class="flex bg-white rounded-2xl shadow-sm border border-gray-100 p-1 mb-6 gap-1">
+                <button onclick="mudarAba('enviar')"    id="tab-enviar"    class="tab ativo flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition">
+                    <i class="fa-solid fa-paper-plane"></i> Enviar
+                </button>
+                <button onclick="mudarAba('receber')"   id="tab-receber"   class="tab flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition">
+                    <i class="fa-solid fa-qrcode"></i> Receber
+                </button>
+                <button onclick="mudarAba('chaves')"    id="tab-chaves"    class="tab flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition">
+                    <i class="fa-solid fa-key"></i> Minhas Chaves
+                </button>
+                <button onclick="mudarAba('historico')" id="tab-historico" class="tab flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Histórico
+                </button>
+            </div>
+
+            <!-- ── ABA: ENVIAR ───────────────────────────────────────── -->
+            <div id="aba-enviar">
+
+                <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 space-y-6">
+
+                    <!-- Conta origem -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fa-solid fa-wallet mr-1 text-ubank"></i>Conta de origem
+                        </label>
+                        <select id="conta-origem" required onchange="atualizarSaldo()"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition">
+                            <option value="">Selecione sua conta...</option>
+                        </select>
+                        <p class="text-xs text-gray-400 mt-1">Saldo: R$ <span id="saldo-origem" class="font-semibold">0,00</span></p>
+                    </div>
+
+                    <!-- Chave Pix -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fa-brands fa-pix mr-1 text-ubank"></i>Chave Pix do destinatário
+                        </label>
+                        <div class="flex gap-2">
+                            <select id="tipo-chave"
+                                    class="bg-gray-50 border border-gray-200 rounded-lg py-3 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition">
+                                <option value="cpf">CPF/CNPJ</option>
+                                <option value="email">E-mail</option>
+                                <option value="telefone">Telefone</option>
+                            </select>
+                            <input type="text" id="chave-pix" placeholder="Digite a chave Pix..."
+                                   class="flex-1 bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition">
+                            <button onclick="buscarDestinatario()"
+                                    class="bg-ubank hover:bg-ubank-dark text-white px-5 rounded-lg text-sm font-bold transition">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card do destinatário (aparece após busca) -->
+                    <div id="card-destinatario" class="hidden p-4 bg-ubank/5 border border-ubank/20 rounded-xl flex items-center gap-3">
+                        <div class="w-10 h-10 bg-ubank rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                            <span id="destinatario-letra">?</span>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800 text-sm" id="destinatario-nome">—</p>
+                            <p class="text-xs text-gray-400">Ag <span id="destinatario-ag">—</span> | Conta <span id="destinatario-conta">—</span></p>
+                        </div>
+                        <i class="fa-solid fa-circle-check text-green-500 ml-auto text-lg"></i>
+                    </div>
+
+                    <!-- Valor -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fa-solid fa-money-bill mr-1 text-ubank"></i>Valor (R$)
+                        </label>
+                        <input type="number" id="valor-pix" min="0.01" step="0.01" placeholder="0,00"
+                               class="w-full bg-gray-50 border border-gray-200 rounded-lg py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition">
+                    </div>
+
+                    <button onclick="enviarPix()" id="btn-enviar"
+                            class="w-full bg-ubank hover:bg-ubank-dark text-white font-bold py-4 rounded-xl shadow-lg shadow-ubank/20 transition-all active:scale-[0.98] flex justify-center items-center gap-2">
+                        <i class="fa-brands fa-pix"></i> Confirmar Pix
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── ABA: RECEBER ──────────────────────────────────────── -->
+            <div id="aba-receber" class="hidden">
+                <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+
+                    <div class="text-center mb-8">
+                        <!-- QR Code simulado -->
+                        <div class="w-44 h-44 mx-auto bg-gray-50 border-2 border-gray-200 rounded-2xl flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-qrcode text-7xl text-gray-300"></i>
+                        </div>
+                        <p class="text-xs text-gray-400">QR Code para receber Pix</p>
+                    </div>
+
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Compartilhe uma de suas chaves</p>
+
+                    <div id="lista-chaves-receber" class="space-y-3">
+                        <p class="text-sm text-gray-400 text-center py-4">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── ABA: MINHAS CHAVES ────────────────────────────────── -->
+            <div id="aba-chaves" class="hidden">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+                    <div class="px-6 py-4 border-b border-gray-100">
+                        <h3 class="font-bold text-gray-800">Chaves cadastradas</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Suas chaves são geradas automaticamente a partir do seu cadastro.</p>
+                    </div>
+
+                    <div id="lista-chaves" class="divide-y divide-gray-50">
+                        <p class="text-sm text-gray-400 text-center py-8">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── ABA: HISTÓRICO ────────────────────────────────────── -->
+            <div id="aba-historico" class="hidden space-y-4">
+
+                <div class="flex items-center gap-3">
+                    <select id="conta-historico" onchange="carregarHistoricoPix()"
+                            class="flex-1 bg-white border border-gray-200 rounded-lg py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition shadow-sm">
+                        <option value="">Selecione a conta...</option>
+                    </select>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-bold text-gray-800">Transferências Pix</h3>
+                        <span id="contador-pix" class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">0 registros</span>
+                    </div>
+                    <div id="lista-historico-pix" class="divide-y divide-gray-50">
+                        <div class="flex flex-col items-center justify-center py-12 text-gray-300">
+                            <i class="fa-brands fa-pix text-4xl mb-3 opacity-40"></i>
+                            <p class="text-sm text-gray-400">Selecione uma conta para ver o histórico</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <style>
+        .tab { color: #6b7280; }
+        .tab.ativo { background: #6D28D9; color: white; }
+    </style>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const API_BASE = 'https://localhost:7044/api';
+        if (!token) window.location.href = 'login.html';
+
+        let contasUsuario = [];
+        let clienteInfo = null;
+        let contaDestinoId = null;
+
+        // ── Inicialização ──────────────────────────────────────────────
+        async function inicializar() {
+            try {
+                const res = await fetch(`${API_BASE}/contas/minhas-contas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+
+                contasUsuario = await res.json();
+
+                // Popula selects de conta
+                ['conta-origem', 'conta-historico'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.innerHTML = '<option value="">Selecione sua conta...</option>';
+                    contasUsuario.forEach(c => {
+                        const o = document.createElement('option');
+                        o.value = c.id;
+                        o.textContent = `Ag ${c.agencia} | Conta ${c.numeroConta}`;
+                        el.appendChild(o);
+                    });
+                });
+
+                // Seleciona única conta automaticamente
+                if (contasUsuario.length === 1) {
+                    document.getElementById('conta-origem').value   = contasUsuario[0].id;
+                    document.getElementById('conta-historico').value = contasUsuario[0].id;
+                    atualizarSaldo();
+                }
+
+                // Carrega dados do cliente para as chaves
+                if (contasUsuario.length > 0) {
+                    const resC = await fetch(`${API_BASE}/Clientes/${contasUsuario[0].idCliente}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (resC.ok) {
+                        clienteInfo = await resC.json();
+                        document.getElementById('avatar-letra').innerText = clienteInfo.nome.charAt(0).toUpperCase();
+                        renderizarChaves();
+                    }
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        // ── Saldo da conta origem ──────────────────────────────────────
+        function atualizarSaldo() {
+            const id = document.getElementById('conta-origem').value;
+            const c = contasUsuario.find(c => c.id == id);
+            document.getElementById('saldo-origem').innerText = c ? c.saldo.toFixed(2) : '0,00';
+        }
+
+        // ── Tabs ───────────────────────────────────────────────────────
+        const abas = ['enviar', 'receber', 'chaves', 'historico'];
+        function mudarAba(aba) {
+            abas.forEach(a => {
+                document.getElementById('aba-' + a).classList.toggle('hidden', a !== aba);
+                document.getElementById('tab-' + a).classList.toggle('ativo', a === aba);
+            });
+            if (aba === 'historico') carregarHistoricoPix();
+        }
+
+        // ── Buscar destinatário por chave Pix ─────────────────────────
+        async function buscarDestinatario() {
+            const chave = document.getElementById('chave-pix').value.trim();
+            if (!chave) { alert('Digite uma chave Pix.'); return; }
+
+            const card = document.getElementById('card-destinatario');
+            card.classList.add('hidden');
+            contaDestinoId = null;
+
+            try {
+                // 1. Busca o cliente pela chave
+                const resCliente = await fetch(`${API_BASE}/Clientes/buscar-por-chave?chave=${encodeURIComponent(chave)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!resCliente.ok) {
+                    const err = await resCliente.json();
+                    alert(err.message || 'Chave Pix não encontrada.');
+                    return;
+                }
+
+                const destinatario = await resCliente.json();
+
+                // 2. Busca as contas desse cliente
+                const resContas = await fetch(`${API_BASE}/contas/por-cliente/${destinatario.id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!resContas.ok) { alert('Erro ao buscar conta do destinatário.'); return; }
+
+                const contas = await resContas.json();
+                const contaDestino = contas.find(c => c.status === 'ativa') ?? contas[0];
+
+                if (!contaDestino) { alert('Destinatário não possui conta ativa.'); return; }
+
+                // Verifica se não é a própria conta
+                const contaOrigemId = parseInt(document.getElementById('conta-origem').value);
+                if (contaDestino.id === contaOrigemId) {
+                    alert('Não é possível enviar Pix para a própria conta.');
+                    return;
+                }
+
+                contaDestinoId = contaDestino.id;
+
+                document.getElementById('destinatario-letra').innerText = destinatario.nome.charAt(0).toUpperCase();
+                document.getElementById('destinatario-nome').innerText  = destinatario.nome;
+                document.getElementById('destinatario-ag').innerText    = contaDestino.agencia;
+                document.getElementById('destinatario-conta').innerText = contaDestino.numeroConta;
+                card.classList.remove('hidden');
+
+            } catch (err) {
+                alert('Erro ao buscar chave Pix.');
+                console.error(err);
+            }
+        }
+
+        // ── Enviar Pix ─────────────────────────────────────────────────
+        async function enviarPix() {
+            const idOrigem = parseInt(document.getElementById('conta-origem').value);
+            const valor = parseFloat(document.getElementById('valor-pix').value);
+
+            if (!idOrigem) { alert('Selecione a conta de origem.'); return; }
+            if (!contaDestinoId) { alert('Busque e confirme o destinatário primeiro.'); return; }
+            if (!valor || valor <= 0) { alert('Informe um valor válido.'); return; }
+
+            const btn = document.getElementById('btn-enviar');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/Transacao/post`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                        tipo: 3,
+                        idContaOrigem: idOrigem,
+                        idContaDestino: contaDestinoId,
+                        valor: valor
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.message || 'Erro ao processar Pix.');
+                }
+
+                alert(`Pix de R$ ${valor.toFixed(2)} enviado com sucesso!`);
+
+                // Limpa formulário
+                document.getElementById('chave-pix').value = '';
+                document.getElementById('valor-pix').value = '';
+                document.getElementById('card-destinatario').classList.add('hidden');
+                contaDestinoId = null;
+
+                // Atualiza saldo local
+                const conta = contasUsuario.find(c => c.id === idOrigem);
+                if (conta) {
+                    conta.saldo -= valor;
+                    atualizarSaldo();
+                }
+
+            } catch (err) {
+                alert('Erro: ' + err.message);
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        // ── Renderizar chaves (usa dados do cliente) ───────────────────
+        function renderizarChaves() {
+            if (!clienteInfo) return;
+
+            const chaves = [
+                { tipo: 'CPF/CNPJ', icone: 'fa-id-card',       valor: clienteInfo.cpfCnpj  },
+                { tipo: 'E-mail',   icone: 'fa-envelope',       valor: clienteInfo.email    },
+                { tipo: 'Telefone', icone: 'fa-mobile-screen',  valor: clienteInfo.telefone },
+            ].filter(c => c.valor);
+
+            const html = chaves.map(c => `
+                <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-ubank/10 flex items-center justify-center">
+                            <i class="fa-solid ${c.icone} text-ubank text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 font-medium">${c.tipo}</p>
+                            <p class="font-semibold text-gray-800 text-sm">${c.valor}</p>
+                        </div>
+                    </div>
+                    <button onclick="copiar('${c.valor}', this)"
+                            class="flex items-center gap-1.5 text-xs font-semibold text-ubank hover:text-ubank-dark transition px-3 py-1.5 rounded-lg hover:bg-ubank/5">
+                        <i class="fa-regular fa-copy"></i> Copiar
+                    </button>
+                </div>`).join('');
+
+            document.getElementById('lista-chaves').innerHTML = html || '<p class="text-sm text-gray-400 text-center py-6">Nenhuma chave cadastrada.</p>';
+
+            // Aba Receber usa as mesmas chaves
+            document.getElementById('lista-chaves-receber').innerHTML = chaves.map(c => `
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid ${c.icone} text-ubank"></i>
+                        <div>
+                            <p class="text-xs text-gray-400">${c.tipo}</p>
+                            <p class="font-semibold text-gray-800 text-sm">${c.valor}</p>
+                        </div>
+                    </div>
+                    <button onclick="copiar('${c.valor}', this)"
+                            class="text-xs font-bold text-ubank hover:text-ubank-dark flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-ubank/10 transition">
+                        <i class="fa-regular fa-copy"></i> Copiar
+                    </button>
+                </div>`).join('');
+        }
+
+        // ── Copiar chave ───────────────────────────────────────────────
+        function copiar(texto, btn) {
+            navigator.clipboard.writeText(texto).then(() => {
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Copiado!';
+                btn.classList.add('text-green-600');
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.classList.remove('text-green-600');
+                }, 2000);
+            });
+        }
+
+        // ── Histórico Pix ──────────────────────────────────────────────
+        async function carregarHistoricoPix() {
+            const contaId = document.getElementById('conta-historico').value;
+            if (!contaId) return;
+
+            const el = document.getElementById('lista-historico-pix');
+            el.innerHTML = '<div class="flex items-center justify-center py-10"><i class="fa-solid fa-spinner fa-spin text-gray-300 text-2xl"></i></div>';
+
+            try {
+                const res = await fetch(`${API_BASE}/Transacao/extrato/${contaId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error();
+
+                const transacoes = (await res.json()).filter(t => t.tipo === 3);
+                document.getElementById('contador-pix').innerText = `${transacoes.length} registro${transacoes.length !== 1 ? 's' : ''}`;
+
+                if (transacoes.length === 0) {
+                    el.innerHTML = '<div class="flex flex-col items-center justify-center py-12 text-gray-300"><i class="fa-brands fa-pix text-4xl mb-3 opacity-40"></i><p class="text-sm text-gray-400">Nenhuma transferência Pix encontrada</p></div>';
+                    return;
+                }
+
+                const cId = parseInt(contaId);
+                el.innerHTML = transacoes
+                    .sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora))
+                    .slice(0, 20)
+                    .map(t => {
+                        const enviado = t.idContaOrigem === cId;
+                        const data = new Date(t.dataHora).toLocaleDateString('pt-BR', {
+                            day: '2-digit', month: '2-digit', year: 'numeric',
+                            hour: '2-digit', minute: '2-digit'
+                        });
+                        return `
+                            <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center ${enviado ? 'bg-orange-100 text-orange-500' : 'bg-green-100 text-green-600'}">
+                                        <i class="fa-brands fa-pix text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800 text-sm">${enviado ? 'Pix Enviado' : 'Pix Recebido'}</p>
+                                        <p class="text-xs text-gray-400">${data}</p>
+                                    </div>
+                                </div>
+                                <p class="font-bold text-sm ${enviado ? 'text-orange-500' : 'text-green-600'}">
+                                    ${enviado ? '-' : '+'} R$ ${t.valor.toFixed(2)}
+                                </p>
+                            </div>`;
+                    }).join('');
+
+            } catch {
+                el.innerHTML = '<p class="text-center text-red-400 py-8 text-sm">Erro ao carregar histórico</p>';
+            }
+        }
+
+        function fazerLogout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        inicializar();
+    </script>
+</body>
+</html>

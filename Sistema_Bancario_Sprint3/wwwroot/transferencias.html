@@ -39,8 +39,11 @@
                 <a href="extrato.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
                     <i class="fa-solid fa-list-ul"></i> Extrato
                 </a>
-                <a href="transferencias-v2.html" class="flex items-center gap-3 bg-ubank text-white px-4 py-3 rounded-lg font-medium transition">
+                <a href="transferencias.html" class="flex items-center gap-3 bg-ubank text-white px-4 py-3 rounded-lg font-medium transition">
                     <i class="fa-solid fa-money-bill-transfer"></i> Transferências
+                </a>
+                <a href="depositos-saques.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> Depósitos e Saques
                 </a>
                 <a href="pix.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
                     <i class="fa-brands fa-pix"></i> Área Pix
@@ -284,7 +287,7 @@
 
         async function carregarContas() {
             try {
-                const response = await fetch(`${API_BASE}/Contas`, {
+                const response = await fetch(`${API_BASE}/contas/minhas-contas`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) throw new Error('Erro ao carregar contas');
@@ -375,12 +378,12 @@
                     if (!idContaDestino) throw new Error('Selecione conta de destino');
 
                     payload.idContaDestino = parseInt(idContaDestino);
-                    payload.tipo = 2; // Transferência
+                    payload.tipo = 3; // Transferência
 
                 } else {
                     // TEF (para backend futuro)
                     if (!document.getElementById('tef-nome').value) throw new Error('Preencha todos os dados do beneficiário');
-                    payload.tipo = 2;
+                    payload.tipo = 3;
                     payload.nomeBeneficiario = document.getElementById('tef-nome').value;
                     payload.cpfCnpj = document.getElementById('tef-cpf').value;
                     payload.banco = document.getElementById('tef-banco').value;

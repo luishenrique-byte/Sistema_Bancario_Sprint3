@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>uBank | Extrato</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ubank: { light: '#8B5CF6', DEFAULT: '#6D28D9', dark: '#4C1D95' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 flex h-screen font-sans text-gray-800 overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 text-white flex flex-col justify-between hidden md:flex">
+        <div>
+            <div class="p-6 flex items-center gap-3 border-b border-gray-800">
+                <i class="fa-solid fa-building-columns text-ubank text-2xl"></i>
+                <h1 class="text-2xl font-bold tracking-wider">uBank<span class="text-ubank">.</span></h1>
+            </div>
+            <nav class="p-4 space-y-2 mt-4">
+                <a href="home.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-house"></i> Início
+                </a>
+                <a href="extrato.html" class="flex items-center gap-3 bg-ubank text-white px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-list-ul"></i> Extrato
+                </a>
+                <a href="transferencias.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-money-bill-transfer"></i> Transferências
+                </a>
+                <a href="depositos-saques.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> Depósitos e Saques
+                </a>
+                <a href="pix.html" class="flex items-center gap-3 text-gray-400 hover:text-white hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                    <i class="fa-brands fa-pix"></i> Área Pix
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-gray-800">
+            <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-400 hover:text-red-300 hover:bg-gray-800 px-4 py-3 rounded-lg font-medium transition">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair da Conta
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 flex flex-col overflow-y-auto">
+
+        <header class="bg-white shadow-sm px-8 py-6 flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Extrato</h2>
+                <p class="text-sm text-gray-500 mt-1">Acompanhe todas as suas movimentações.</p>
+            </div>
+            <div class="h-12 w-12 bg-ubank rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
+                <span id="avatar-letra">C</span>
+            </div>
+        </header>
+
+        <div class="p-8 max-w-5xl mx-auto w-full space-y-6">
+
+            <!-- Filtros superiores -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+
+                    <!-- Conta -->
+                    <div class="flex items-center gap-3 flex-1">
+                        <i class="fa-solid fa-wallet text-ubank"></i>
+                        <select id="conta-selecionada" onchange="onContaMudou()"
+                                class="flex-1 bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ubank/50 focus:border-ubank transition">
+                            <option value="">Selecione a conta...</option>
+                        </select>
+                    </div>
+
+                    <!-- Período -->
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="setPeriodo('mes')"    id="btn-mes"     class="filtro-periodo ativo px-3 py-1.5 rounded-lg text-xs font-semibold transition">Este mês</button>
+                        <button onclick="setPeriodo('anterior')" id="btn-anterior" class="filtro-periodo px-3 py-1.5 rounded-lg text-xs font-semibold transition">Mês anterior</button>
+                        <button onclick="setPeriodo('3meses')" id="btn-3meses"  class="filtro-periodo px-3 py-1.5 rounded-lg text-xs font-semibold transition">3 meses</button>
+                        <button onclick="setPeriodo('tudo')"   id="btn-tudo"    class="filtro-periodo px-3 py-1.5 rounded-lg text-xs font-semibold transition">Tudo</button>
+                    </div>
+                </div>
+
+                <!-- Filtro tipo -->
+                <div class="flex gap-2 mt-4 flex-wrap">
+                    <button onclick="setTipo('todos')"         id="tipo-todos"         class="filtro-tipo ativo px-3 py-1.5 rounded-full text-xs font-semibold border transition">Todos</button>
+                    <button onclick="setTipo('deposito')"      id="tipo-deposito"      class="filtro-tipo px-3 py-1.5 rounded-full text-xs font-semibold border transition">Depósitos</button>
+                    <button onclick="setTipo('saque')"         id="tipo-saque"         class="filtro-tipo px-3 py-1.5 rounded-full text-xs font-semibold border transition">Saques</button>
+                    <button onclick="setTipo('transferencia')" id="tipo-transferencia" class="filtro-tipo px-3 py-1.5 rounded-full text-xs font-semibold border transition">Transferências</button>
+                </div>
+            </div>
+
+            <!-- Cards de resumo -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                            <i class="fa-solid fa-arrow-down text-green-600 text-xs"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total Entradas</p>
+                    </div>
+                    <p class="text-2xl font-bold text-green-600">R$ <span id="total-entradas">0,00</span></p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                            <i class="fa-solid fa-arrow-up text-red-500 text-xs"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total Saídas</p>
+                    </div>
+                    <p class="text-2xl font-bold text-red-500">R$ <span id="total-saidas">0,00</span></p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-8 h-8 rounded-full bg-ubank/10 flex items-center justify-center">
+                            <i class="fa-solid fa-scale-balanced text-ubank text-xs"></i>
+                        </div>
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Resultado</p>
+                    </div>
+                    <p id="resultado-valor" class="text-2xl font-bold text-gray-800">R$ <span id="total-resultado">0,00</span></p>
+                </div>
+            </div>
+
+            <!-- Lista de transações -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h3 class="font-bold text-gray-800">Movimentações</h3>
+                    <span id="contador-transacoes" class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">0 transações</span>
+                </div>
+
+                <div id="lista-extrato" class="divide-y divide-gray-50">
+                    <div class="flex flex-col items-center justify-center py-16 text-gray-400">
+                        <i class="fa-solid fa-wallet text-4xl mb-3 opacity-30"></i>
+                        <p class="text-sm">Selecione uma conta para ver o extrato</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <style>
+        .filtro-periodo {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        .filtro-periodo.ativo {
+            background: #6D28D9;
+            color: #ffffff;
+        }
+        .filtro-tipo {
+            background: white;
+            color: #6b7280;
+            border-color: #e5e7eb;
+        }
+        .filtro-tipo.ativo {
+            background: #6D28D9;
+            color: white;
+            border-color: #6D28D9;
+        }
+    </style>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const API_BASE = 'https://localhost:7044/api';
+        if (!token) window.location.href = 'login.html';
+
+        let todasTransacoes = [];
+        let contaAtualId = null;
+        let periodoAtual = 'mes';
+        let tipoAtual = 'todos';
+
+        // ── Inicialização ──────────────────────────────────────────────
+        async function inicializar() {
+            try {
+                const res = await fetch(`${API_BASE}/contas/minhas-contas`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+
+                const contas = await res.json();
+                const select = document.getElementById('conta-selecionada');
+                select.innerHTML = '<option value="">Selecione a conta...</option>';
+
+                contas.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = `Ag ${c.agencia} | Conta ${c.numeroConta}`;
+                    select.appendChild(opt);
+                });
+
+                if (contas.length === 1) {
+                    select.value = contas[0].id;
+                    onContaMudou();
+                }
+
+                // Avatar
+                if (contas.length > 0) {
+                    const resC = await fetch(`${API_BASE}/Clientes/${contas[0].idCliente}`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (resC.ok) {
+                        const cli = await resC.json();
+                        document.getElementById('avatar-letra').innerText = cli.nome.charAt(0).toUpperCase();
+                    }
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        // ── Ao selecionar conta ────────────────────────────────────────
+        async function onContaMudou() {
+            const id = document.getElementById('conta-selecionada').value;
+            if (!id) return;
+            contaAtualId = parseInt(id);
+            await carregarExtrato();
+        }
+
+        // ── Busca extrato na API ───────────────────────────────────────
+        async function carregarExtrato() {
+            if (!contaAtualId) return;
+
+            document.getElementById('lista-extrato').innerHTML = `
+                <div class="flex items-center justify-center py-16 text-gray-300">
+                    <i class="fa-solid fa-spinner fa-spin text-3xl"></i>
+                </div>`;
+
+            try {
+                const res = await fetch(`${API_BASE}/Transacao/extrato/${contaAtualId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error();
+                todasTransacoes = await res.json();
+                renderizar();
+            } catch {
+                document.getElementById('lista-extrato').innerHTML = `
+                    <p class="text-center text-red-400 py-10 text-sm">Erro ao carregar extrato</p>`;
+            }
+        }
+
+        // ── Filtros ────────────────────────────────────────────────────
+        function setPeriodo(p) {
+            periodoAtual = p;
+            document.querySelectorAll('.filtro-periodo').forEach(b => b.classList.remove('ativo'));
+            document.getElementById('btn-' + p).classList.add('ativo');
+            renderizar();
+        }
+
+        function setTipo(t) {
+            tipoAtual = t;
+            document.querySelectorAll('.filtro-tipo').forEach(b => b.classList.remove('ativo'));
+            document.getElementById('tipo-' + t).classList.add('ativo');
+            renderizar();
+        }
+
+        function filtrarPorPeriodo(t) {
+            const hoje = new Date();
+            const data = new Date(t.dataHora);
+            if (periodoAtual === 'mes') {
+                return data.getMonth() === hoje.getMonth() && data.getFullYear() === hoje.getFullYear();
+            }
+            if (periodoAtual === 'anterior') {
+                const mes = hoje.getMonth() === 0 ? 11 : hoje.getMonth() - 1;
+                const ano = hoje.getMonth() === 0 ? hoje.getFullYear() - 1 : hoje.getFullYear();
+                return data.getMonth() === mes && data.getFullYear() === ano;
+            }
+            if (periodoAtual === '3meses') {
+                const limite = new Date(hoje);
+                limite.setMonth(hoje.getMonth() - 3);
+                return data >= limite;
+            }
+            return true; // tudo
+        }
+
+        function filtrarPorTipo(t) {
+            if (tipoAtual === 'todos') return true;
+            if (tipoAtual === 'deposito') return t.tipo === 1;
+            if (tipoAtual === 'saque')    return t.tipo === 2;
+            return t.tipo === 3; // transferencia
+        }
+
+        // ── Determina se a transação é entrada ou saída para esta conta ─
+        function isEntrada(t) {
+            if (t.tipo === 1) return true;  // Depósito → sempre entrada
+            if (t.tipo === 2) return false; // Saque → sempre saída
+            // Transferência: saída se essa conta é a origem
+            return t.idContaOrigem !== contaAtualId;
+        }
+
+        // ── Renderiza lista e resumo ───────────────────────────────────
+        function renderizar() {
+            const filtradas = todasTransacoes
+                .filter(filtrarPorPeriodo)
+                .filter(filtrarPorTipo)
+                .sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
+
+            // Resumo
+            let entradas = 0, saidas = 0;
+            filtradas.forEach(t => {
+                if (isEntrada(t)) entradas += t.valor;
+                else saidas += t.valor;
+            });
+            const resultado = entradas - saidas;
+
+            document.getElementById('total-entradas').innerText = entradas.toFixed(2);
+            document.getElementById('total-saidas').innerText   = saidas.toFixed(2);
+            document.getElementById('total-resultado').innerText = Math.abs(resultado).toFixed(2);
+
+            const resEl = document.getElementById('resultado-valor');
+            resEl.className = resultado >= 0
+                ? 'text-2xl font-bold text-green-600'
+                : 'text-2xl font-bold text-red-500';
+
+            document.getElementById('contador-transacoes').innerText = `${filtradas.length} transação${filtradas.length !== 1 ? 'ões' : ''}`;
+
+            if (filtradas.length === 0) {
+                document.getElementById('lista-extrato').innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-16 text-gray-300">
+                        <i class="fa-solid fa-magnifying-glass text-4xl mb-3 opacity-40"></i>
+                        <p class="text-sm text-gray-400">Nenhuma transação encontrada neste período</p>
+                    </div>`;
+                return;
+            }
+
+            // Agrupa por mês/ano
+            const grupos = {};
+            filtradas.forEach(t => {
+                const d = new Date(t.dataHora);
+                const chave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                if (!grupos[chave]) grupos[chave] = [];
+                grupos[chave].push(t);
+            });
+
+            let html = '';
+            Object.keys(grupos).sort((a, b) => b.localeCompare(a)).forEach(chave => {
+                const [ano, mes] = chave.split('-');
+                const nomeMes = new Date(ano, mes - 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+                html += `
+                    <div class="px-6 py-3 bg-gray-50 border-b border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">${nomeMes}</p>
+                    </div>`;
+
+                grupos[chave].forEach(t => {
+                    const entrada = isEntrada(t);
+                    const data = new Date(t.dataHora).toLocaleDateString('pt-BR', {
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit'
+                    });
+
+                    const tipoInfo = {
+                        1: { label: 'Depósito',       icone: 'fa-arrow-down',             badge: 'bg-green-100 text-green-700' },
+                        2: { label: 'Saque',           icone: 'fa-arrow-up',               badge: 'bg-red-100 text-red-600'   },
+                        3: { label: entrada ? 'Transferência Recebida' : 'Transferência Enviada',
+                             icone: entrada ? 'fa-arrow-down' : 'fa-arrow-up',
+                             badge: entrada ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600' }
+                    }[t.tipo] ?? { label: 'Operação', icone: 'fa-circle', badge: 'bg-gray-100 text-gray-500' };
+
+                    html += `
+                        <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
+                                    ${entrada ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}">
+                                    <i class="fa-solid ${tipoInfo.icone} text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <p class="font-semibold text-gray-800 text-sm">${tipoInfo.label}</p>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${tipoInfo.badge}">
+                                            ${tipoInfo.label.split(' ')[0]}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-0.5">${data}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-sm ${entrada ? 'text-green-600' : 'text-red-500'}">
+                                    ${entrada ? '+' : '-'} R$ ${t.valor.toFixed(2)}
+                                </p>
+                                <p class="text-[10px] text-gray-400 mt-0.5">#${t.id}</p>
+                            </div>
+                        </div>`;
+                });
+            });
+
+            document.getElementById('lista-extrato').innerHTML = html;
+        }
+
+        function fazerLogout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+        inicializar();
+    </script>
+</body>
+</html>
