@@ -157,7 +157,7 @@
                 telefone: "00000000",
                 tipoPessoa: 1
             };
-            const res = await fetch('https://localhost:7044/api/clientes', { method: 'POST', headers, body: JSON.stringify(body) });
+            const res = await fetch('/api/clientes', { method: 'POST', headers, body: JSON.stringify(body) });
             if (res.ok) {
                 const data = await res.json();
                 alert(`Cliente cadastrado! ANOTE O ID: ${data.id}`);
@@ -175,7 +175,7 @@
                 saldo: 0,
                 status: 1
             };
-            const res = await fetch('https://localhost:7044/api/contas', { method: 'POST', headers, body: JSON.stringify(body) });
+            const res = await fetch('/api/contas', { method: 'POST', headers, body: JSON.stringify(body) });
             if (res.ok) {
                 const data = await res.json();
                 alert(`Conta criada! ANOTE O ID DA CONTA: ${data.id}`);
@@ -190,7 +190,7 @@
                 valor: parseFloat(document.getElementById('valorTransacao').value),
                 idContaOrigem: parseInt(document.getElementById('idContaOrigem').value)
             };
-            const res = await fetch('https://localhost:7044/api/Transacao', { method: 'POST', headers, body: JSON.stringify(body) });
+            const res = await fetch('/api/Transacao', { method: 'POST', headers, body: JSON.stringify(body) });
             if (res.ok) { alert("Saldo adicionado com sucesso!"); }
             else { alert("Erro na transação"); }
         });

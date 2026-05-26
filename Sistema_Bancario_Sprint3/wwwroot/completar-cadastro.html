@@ -171,7 +171,7 @@
 
             try {
                 // 1. Criar o cliente
-                const resCliente = await fetch('https://localhost:7044/api/Clientes', {
+                const resCliente = await fetch('/api/Clientes', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -190,7 +190,7 @@
                 const clienteCriado = await resCliente.json();
 
                 // 2. Criar a conta vinculada ao cliente
-                const resConta = await fetch('https://localhost:7044/api/contas', {
+                const resConta = await fetch('/api/contas', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
