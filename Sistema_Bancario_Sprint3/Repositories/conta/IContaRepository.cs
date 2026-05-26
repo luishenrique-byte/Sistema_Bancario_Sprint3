@@ -6,6 +6,7 @@ namespace Sistema_Bancario_Sprint3.Repositories.conta
     {
         Task<IEnumerable<Conta>> GetContas();
         Task<Conta> GetContaById(long id);
+        Task<IEnumerable<Conta>> GetContasByClienteId(long clienteId);
         Task PostConta(Conta conta);
         Task UpdateConta(Conta conta);
         Task DeleteConta(long id);

@@ -24,6 +24,20 @@ namespace Sistema_Bancario_Sprint3.Controllers
             return Ok(clientes);
         }
 
+        [Authorize]
+        [HttpGet("buscar-por-chave")]
+        public async Task<IActionResult> BuscarPorChave([FromQuery] string chave)
+        {
+            if (string.IsNullOrWhiteSpace(chave))
+                return BadRequest(new { message = "Chave inválida." });
+
+            var cliente = await _service.BuscarPorChave(chave.Trim());
+            if (cliente == null)
+                return NotFound(new { message = "Nenhuma conta encontrada para esta chave Pix." });
+
+            return Ok(new { id = cliente.Id, nome = cliente.Nome });
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCliente(long id)
         {

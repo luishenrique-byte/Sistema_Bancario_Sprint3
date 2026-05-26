@@ -4,9 +4,10 @@ namespace Sistema_Bancario_Sprint3.DTOs.conta
 {
     public class ContaRequestDTO
     {
-        public string NumeroConta { get; set; }
-        public string Agencia { get; set; }
-        public Status Status { get; set; }
+        // NumeroConta e Agencia são gerados automaticamente no servidor (ignorados na criação)
+        public string? NumeroConta { get; set; }
+        public string? Agencia { get; set; }
+        public Status? Status { get; set; }
         public long IdCliente { get; set; }
         public long IdTipoConta { get; set; }
         public string? CnpjVinculado { get; set; }

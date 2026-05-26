@@ -68,8 +68,19 @@ namespace Sistema_Bancario_Sprint3.Services.transacao
 
         public void ValidarSaque(Conta conta, decimal valor)
         {
-            if (conta.Saldo < valor)
-                throw new InvalidOperationException($"Saldo insuficiente. Disponível: R$ {conta.Saldo:N2}");
+            // Contas empresariais podem usar o limite de crédito como saldo extra
+            var isEmpresarial = conta.IdTipoConta == 3 && conta.LimiteCredito.HasValue;
+            var disponivel = isEmpresarial
+                ? conta.Saldo + conta.LimiteCredito!.Value
+                : conta.Saldo;
+
+            if (valor > disponivel)
+            {
+                var msg = isEmpresarial
+                    ? $"Limite insuficiente. Disponível: R$ {disponivel:N2} (Saldo: R$ {conta.Saldo:N2} | Crédito: R$ {conta.LimiteCredito!.Value:N2})"
+                    : $"Saldo insuficiente. Disponível: R$ {conta.Saldo:N2}";
+                throw new InvalidOperationException(msg);
+            }
         }
 
         public void ValidarTransferencia(TransacaoRequestDTO request, Conta contaOrigem)

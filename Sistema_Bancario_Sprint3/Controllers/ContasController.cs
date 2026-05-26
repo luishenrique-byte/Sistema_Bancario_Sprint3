@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sistema_Bancario_Sprint3.DTOs.conta;
+using Sistema_Bancario_Sprint3.Repositories.usuario;
 using Sistema_Bancario_Sprint3.Services.conta;
 
 namespace Sistema_Bancario_Sprint3.Controllers
@@ -10,16 +11,42 @@ namespace Sistema_Bancario_Sprint3.Controllers
     public class ContasController : ControllerBase
     {
         private readonly IContaService _service;
+        private readonly IUsuarioRepository _usuarioRepository;
 
-        public ContasController(IContaService service)
+        public ContasController(IContaService service, IUsuarioRepository usuarioRepository)
         {
             _service = service;
+            _usuarioRepository = usuarioRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetContas()
         {
             var contas = await _service.ObterTodas();
+            return Ok(contas);
+        }
+
+        [Authorize]
+        [HttpGet("minhas-contas")]
+        public async Task<IActionResult> GetMinhasContas()
+        {
+            var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(email))
+                return Unauthorized(new { message = "Token inválido." });
+
+            var usuario = await _usuarioRepository.GetByEmailAsync(email);
+            if (usuario == null || usuario.IdCliente == null)
+                return Ok(new List<object>());
+
+            var contas = await _service.ObterPorCliente(usuario.IdCliente.Value);
+            return Ok(contas);
+        }
+
+        [Authorize]
+        [HttpGet("por-cliente/{clienteId}")]
+        public async Task<IActionResult> GetContasByCliente(long clienteId)
+        {
+            var contas = await _service.ObterPorCliente(clienteId);
             return Ok(contas);
         }
 
@@ -39,8 +66,15 @@ namespace Sistema_Bancario_Sprint3.Controllers
         [HttpPost]
         public async Task<IActionResult> PostConta(ContaRequestDTO request)
         {
-            var novaConta = await _service.CriarConta(request);
-            return CreatedAtAction(nameof(GetContaById), new { id = novaConta.Id }, novaConta);
+            try
+            {
+                var novaConta = await _service.CriarConta(request);
+                return CreatedAtAction(nameof(GetContaById), new { id = novaConta.Id }, novaConta);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [Authorize]

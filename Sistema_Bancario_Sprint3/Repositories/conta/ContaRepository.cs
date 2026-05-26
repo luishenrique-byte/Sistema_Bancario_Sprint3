@@ -23,6 +23,14 @@ namespace Sistema_Bancario_Sprint3.Repositories.conta
             return await _context.Contas.FindAsync(id);
         }
 
+        public async Task<IEnumerable<Conta>> GetContasByClienteId(long clienteId)
+        {
+            return await _context.Contas
+                .Where(c => c.IdCliente == clienteId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task PostConta(Conta conta)
         {
             await _context.Contas.AddAsync(conta);

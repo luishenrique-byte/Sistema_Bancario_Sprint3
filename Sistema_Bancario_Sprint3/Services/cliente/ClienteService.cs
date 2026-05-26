@@ -45,6 +45,21 @@ namespace Sistema_Bancario_Sprint3.Services.cliente
                 DataCadastro = cliente.DataCadastro
             };
         }
+        public async Task<ClienteResponseDTO?> BuscarPorChave(string chave)
+        {
+            var cliente = await _repository.GetClienteByChave(chave);
+            if (cliente == null) return null;
+            return new ClienteResponseDTO
+            {
+                Id = cliente.Id,
+                Nome = cliente.Nome,
+                Email = cliente.Email,
+                Telefone = cliente.Telefone,
+                TipoPessoa = cliente.TipoPessoa,
+                DataCadastro = cliente.DataCadastro
+            };
+        }
+
         public async Task<ClienteResponseDTO> CriarCliente(ClienteRequestDTO clienteDTO)
         {
             var novoCliente = new Cliente

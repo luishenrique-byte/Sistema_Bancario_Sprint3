@@ -23,6 +23,15 @@ namespace Sistema_Bancario_Sprint3.Repositories.cliente
         {
             return await _context.Clientes.FindAsync(id);
         }
+
+        // READ ONE (Buscar por Chave Pix)
+        public async Task<Cliente?> GetClienteByChave(string chave)
+        {
+            return await _context.Clientes.FirstOrDefaultAsync(c =>
+                c.Email == chave ||
+                c.cpfCnpj == chave ||
+                c.Telefone == chave);
+        }
         // CREATE
         public async Task PostCliente(Cliente cliente)
         {

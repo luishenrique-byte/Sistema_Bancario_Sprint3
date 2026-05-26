@@ -7,6 +7,7 @@ namespace Sistema_Bancario_Sprint3.Services.cliente
     {
         Task<IEnumerable<ClienteResponseDTO>> ObterTodos();
         Task<ClienteResponseDTO> ObterPorId(long id);
+        Task<ClienteResponseDTO?> BuscarPorChave(string chave);
         Task<ClienteResponseDTO> CriarCliente(ClienteRequestDTO clienteResquest);
         Task DeletarCliente(long id);
         Task AtualizarCliente(long id,ClienteRequestDTO clienteRequest);

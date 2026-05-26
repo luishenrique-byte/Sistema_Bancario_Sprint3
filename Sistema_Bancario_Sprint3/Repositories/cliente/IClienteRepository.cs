@@ -8,6 +8,8 @@ namespace Sistema_Bancario_Sprint3.Repositories.cliente
         Task<IEnumerable<Cliente>> GetClientes();
         // READ ONE (Buscar por ID)
         Task<Cliente> GetClienteById(long id);
+        // READ ONE (Buscar por Chave Pix: email, CPF/CNPJ ou telefone)
+        Task<Cliente?> GetClienteByChave(string chave);
         // CREATE
         Task PostCliente(Cliente cliente);
         // UPDATE
